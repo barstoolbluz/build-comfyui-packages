@@ -14,7 +14,7 @@ python3.pkgs.buildPythonPackage rec {
     owner = "ultralytics";
     repo = "ultralytics";
     rev = "v${version}";
-    hash = "";  # Will get from error message
+    hash = "sha256-it9yxKXcFF6qO+np0ii6Sg8JymqXAqhk8KJnl9upmgs=";
   };
 
   build-system = with python3.pkgs; [
