@@ -2,9 +2,52 @@
   "lockfile-version": 1,
   "manifest": {
     "version": 1,
-    "hook": {},
+    "install": {
+      "python": {
+        "pkg-path": "python313Full"
+      }
+    },
+    "hook": {
+      "on-activate": "echo \"\"\necho \"ComfyUI Add-ons Build Environment\"\necho \"==================================\"\necho \"\"\necho \"Packages in .flox/pkgs/:\"\nls -1 \"$FLOX_ENV_PROJECT/.flox/pkgs/\"*.nix 2>/dev/null | xargs -I{} basename {} .nix | sed 's/^/  - /'\necho \"\"\necho \"Build with: flox build <package-name>\"\necho \"\"\necho \"After building, reference in comfyui-repo manifest via store-path.\"\necho \"\"\n"
+    },
     "profile": {},
-    "options": {}
+    "options": {
+      "systems": [
+        "x86_64-linux"
+      ],
+      "cuda-detection": true
+    }
   },
-  "packages": []
+  "packages": [
+    {
+      "attr_path": "python313Full",
+      "broken": false,
+      "derivation": "/nix/store/yps7ag8sxphi6axld04vq9bx6cqhfqma-python3-3.13.6.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b599843bad24621dcaa5ab60dac98f9b0eb1cabe",
+      "name": "python3-3.13.6",
+      "pname": "python313Full",
+      "rev": "b599843bad24621dcaa5ab60dac98f9b0eb1cabe",
+      "rev_count": 858212,
+      "rev_date": "2025-09-08T16:06:28Z",
+      "scrape_date": "2025-09-10T03:35:13.255369Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3-3.13.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/6c54bxd0w634v5s8mfx1z5y6rvsq6xp6-python3-3.13.6-debug",
+        "out": "/nix/store/0n3p6v273rh7g1ypbfc0vwlw1sw79y1p-python3-3.13.6"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
 }
