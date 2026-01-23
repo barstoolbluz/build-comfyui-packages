@@ -7,7 +7,7 @@
 
 python3.pkgs.buildPythonPackage rec {
   pname = "comfyui-ultralytics";
-  version = "0.9.1";
+  version = "0.10.0";
   pyproject = true;
 
   src = fetchFromGitHub {
