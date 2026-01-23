@@ -26,7 +26,7 @@ python3.pkgs.buildPythonPackage rec {
     # Core dependencies from pyproject.toml
     numpy
     matplotlib
-    opencv4
+    opencv-python
     pillow
     pyyaml
     requests
@@ -36,6 +36,10 @@ python3.pkgs.buildPythonPackage rec {
     psutil
     polars
     ultralytics-thop
+    # Additional runtime deps discovered during build
+    tqdm
+    py-cpuinfo
+    pandas
   ];
 
   # Disable tests - they require downloading models
