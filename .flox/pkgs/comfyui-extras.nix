@@ -113,21 +113,11 @@ python3.pkgs.buildPythonPackage rec {
   '';
 
   meta = with lib; {
-    description = "Torch-agnostic Python dependencies for ComfyUI custom nodes";
+    description = "[DEPRECATED] Testing-only version - do not use in production";
     longDescription = ''
-      A comprehensive collection of Python packages required by popular ComfyUI
-      custom nodes including Impact Pack, WAS Node Suite, and Efficiency Nodes.
+      DEPRECATED: This version (1.0.0) is a testing-only release. Do not use in production.
 
-      All ML packages that normally depend on PyTorch (ultralytics, timm,
-      open-clip, accelerate, segment-anything, clip-interrogator, etc.) have
-      been rebuilt WITHOUT torch/torchvision in their closures. This ensures
-      they use the CUDA-enabled PyTorch provided by the runtime environment,
-      avoiding conflicts with CPU-only torch that can cause GPU operations
-      to silently fall back to CPU.
-
-      Includes: ultralytics, timm, open-clip-torch, accelerate, segment-anything,
-      clip-interrogator, transparent-background, pixeloe, rembg, colour-science,
-      color-matcher, albumentations, pymatting, pillow-heif, ffmpy, and more.
+      Use a versioned release that matches your target ComfyUI version instead.
     '';
     homepage = "https://github.com/barstoolbluz/build-comfyui-packages";
     license = licenses.mit;
