@@ -1,16 +1,20 @@
-# Flox Build Environment for ComfyUI Add-ons
-# ===========================================
+# Flox Build Environment for ComfyUI Packages
+# ============================================
 # This environment builds Python packages for ComfyUI that need to work
 # with CUDA-enabled PyTorch. The key insight is that we DON'T include
 # torch/torchvision as build dependencies - they're provided by the
 # runtime environment (comfyui-repo).
 #
 # Nix expression builds are in .flox/pkgs/:
-#   - comfyui-ultralytics.nix
+#   - comfyui-ultralytics.nix  (Ultralytics YOLO)
+#   - timm.nix                 (PyTorch Image Models)
+#   - segment-anything.nix     (Meta SAM)
+#   - spandrel.nix             (Upscaler architectures)
+#   - open-clip-torch.nix      (OpenAI CLIP)
 #
 # Usage:
 #   flox build                    # Build all packages
-#   flox build comfyui-ultralytics # Build specific package
+#   flox build timm               # Build specific package
 #
 # The built packages can then be referenced in comfyui-repo via store-path.
 
@@ -26,8 +30,8 @@ python.pkg-path = "python313Full"
 [hook]
 on-activate = '''
 echo ""
-echo "ComfyUI Add-ons Build Environment"
-echo "=================================="
+echo "ComfyUI Packages Build Environment"
+echo "==================================="
 echo ""
 echo "Packages in .flox/pkgs/:"
 ls -1 "$FLOX_ENV_PROJECT/.flox/pkgs/"*.nix 2>/dev/null | xargs -I{} basename {} .nix | sed 's/^/  - /'

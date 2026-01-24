@@ -8,7 +8,7 @@
       }
     },
     "hook": {
-      "on-activate": "echo \"\"\necho \"ComfyUI Add-ons Build Environment\"\necho \"==================================\"\necho \"\"\necho \"Packages in .flox/pkgs/:\"\nls -1 \"$FLOX_ENV_PROJECT/.flox/pkgs/\"*.nix 2>/dev/null | xargs -I{} basename {} .nix | sed 's/^/  - /'\necho \"\"\necho \"Build with: flox build <package-name>\"\necho \"\"\necho \"After building, reference in comfyui-repo manifest via store-path.\"\necho \"\"\n"
+      "on-activate": "echo \"\"\necho \"ComfyUI Packages Build Environment\"\necho \"===================================\"\necho \"\"\necho \"Packages in .flox/pkgs/:\"\nls -1 \"$FLOX_ENV_PROJECT/.flox/pkgs/\"*.nix 2>/dev/null | xargs -I{} basename {} .nix | sed 's/^/  - /'\necho \"\"\necho \"Build with: flox build <package-name>\"\necho \"\"\necho \"After building, reference in comfyui-repo manifest via store-path.\"\necho \"\"\n"
     },
     "profile": {},
     "options": {
