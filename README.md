@@ -34,10 +34,11 @@ build-comfyui-packages/
 │       ├── comfyui-accelerate.nix
 │       ├── ...                # Individual package definitions
 │       └── timm.nix
-├── sources/                   # Vendored packages (wheels/tarballs)
+├── sources/                   # Vendored packages (wheels/tarballs/code)
 │   ├── color_matcher-0.6.0-py3-none-any.whl
 │   ├── cstr-*.tar.gz
-│   └── img2texture-*.tar.gz
+│   ├── img2texture-*.tar.gz
+│   └── ComfyUI-SafeCLIP-SDXL/  # Vendored custom node (no upstream repo)
 └── result-*                   # Build output symlinks (gitignored)
 ```
 
@@ -77,12 +78,39 @@ These packages have no torch dependencies but aren't in nixpkgs or need specific
 | `img2texture` | Seamless texture generation | Vendored tarball |
 | `cstr` | Colored terminal strings | Vendored tarball |
 
-### Meta-Package
+### Meta-Packages
 
-`comfyui-extras` aggregates all packages above (except spandrel) plus these from nixpkgs:
+This repository provides four meta-packages that aggregate different categories of ComfyUI dependencies:
+
+| Meta-Package | Description | Platforms |
+|--------------|-------------|-----------|
+| `comfyui-extras` | Torch-agnostic ML packages + clean utilities | x86_64-linux |
+| `comfyui-plugins` | Impact Pack (FaceDetailer, detection nodes) | x86_64-linux |
+| `comfyui-impact-subpack` | Impact Subpack (YOLO detector, SAM loader) | x86_64-linux |
+| `comfyui-custom-nodes` | 14 community custom nodes from GitHub | All platforms |
+
+#### comfyui-extras
+
+Aggregates all torch-agnostic ML packages (except spandrel) plus these from nixpkgs:
 - piexif, simpleeval, numba, gitpython, onnxruntime, easydict, pymatting, pillow-heif, rich, albumentations
 
-**Note:** The meta-package is currently **x86_64-linux only** because most torch-agnostic ML packages only support Linux.
+#### comfyui-plugins
+
+Provides ComfyUI-Impact-Pack, the essential custom node collection with FaceDetailer, object detection, mask operations, and batch processing. Requires `comfyui-extras` for Python dependencies (ultralytics, segment-anything).
+
+#### comfyui-impact-subpack
+
+Provides ComfyUI-Impact-Subpack with UltralyticsDetectorProvider (YOLO detection) and SAMLoader nodes. Requires `comfyui-plugins` (Impact Pack) and `comfyui-extras` for Python dependencies.
+
+#### comfyui-custom-nodes
+
+Bundles 14 essential community custom nodes:
+- rgthree-comfy, images-grid-comfy-plugin, ComfyUI-Image-Saver, ComfyUI_UltimateSDUpscale
+- ComfyUI-KJNodes, ComfyUI_essentials, ComfyUI-Custom-Scripts, ComfyUI_Comfyroll_CustomNodes
+- efficiency-nodes-comfyui, was-node-suite-comfyui, ComfyUI-mxToolkit
+- ComfyUI_IPAdapter_plus, ComfyUI-IPAdapter-Flux, ComfyUI-SafeCLIP-SDXL
+
+**Note:** `comfyui-extras` and `comfyui-plugins` are **x86_64-linux only** due to torch-agnostic ML package constraints.
 
 ### Platform Support Summary
 
@@ -332,8 +360,9 @@ main-testing → main-staging → main
 
 ## Related Repositories
 
+- **build-comfyui**: ComfyUI source distribution package (provides the core application)
 - **comfyui-repo**: Runtime environment that consumes these packages
-- **ComfyUI**: The main ComfyUI application
+- **ComfyUI**: The upstream ComfyUI application
 
 ## License
 

@@ -15,6 +15,8 @@
 #   - efficiency-nodes-comfyui: Efficiency workflow nodes
 #   - was-node-suite-comfyui: WAS node suite
 #   - ComfyUI-mxToolkit: MX toolkit nodes
+#   - ComfyUI_IPAdapter_plus: IPAdapter image-to-image conditioning
+#   - ComfyUI-IPAdapter-Flux: IPAdapter for FLUX models
 #   - ComfyUI-SafeCLIP-SDXL: Safe CLIP encoding for SDXL (vendored)
 #
 # Note: ComfyUI-Manager is excluded (ships with ComfyUI now).
@@ -106,6 +108,20 @@ let
       rev = "7f7a0e584f12078a1c589645d866ae96bad0cc35";
       hash = "sha256-0vf6rkDzUvsQwhmOHEigq1yUd/VQGFNLwjp9/P9wJ10=";
     };
+
+    ComfyUI_IPAdapter_plus = fetchFromGitHub {
+      owner = "cubiq";
+      repo = "ComfyUI_IPAdapter_plus";
+      rev = "a0f451a5113cf9becb0847b92884cb10cbdec0ef";
+      hash = "sha256-Ft9WJcmjzon2tAMJq5na24iqYTnQWEQFSKUElSVwYgw=";
+    };
+
+    ComfyUI-IPAdapter-Flux = fetchFromGitHub {
+      owner = "Shakker-Labs";
+      repo = "ComfyUI-IPAdapter-Flux";
+      rev = "eef22b6875ddaf10f13657248b8123d6bdec2014";
+      hash = "sha256-sd/krgeQAw19nz6oYUrjXq1KiXMnJ2jV7LjL++AiaA0=";
+    };
   };
 
   nodeNames = builtins.attrNames nodeSources;
@@ -158,6 +174,8 @@ in stdenv.mkDerivation rec {
       - efficiency-nodes-comfyui: Efficiency workflow nodes
       - was-node-suite-comfyui: WAS comprehensive node suite
       - ComfyUI-mxToolkit: MX toolkit nodes
+      - ComfyUI_IPAdapter_plus: IPAdapter image-to-image conditioning
+      - ComfyUI-IPAdapter-Flux: IPAdapter for FLUX models
       - ComfyUI-SafeCLIP-SDXL: Safe CLIP encoding for SDXL
 
       Note: ComfyUI-Manager is excluded (now ships with ComfyUI).
