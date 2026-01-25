@@ -1,0 +1,172 @@
+# comfyui-custom-nodes: Community Custom Nodes for ComfyUI
+# =========================================================
+# This package bundles essential community custom nodes for ComfyUI.
+# Nodes are fetched from GitHub at pinned versions for reproducibility.
+#
+# Included nodes:
+#   - rgthree-comfy: Quality-of-life improvements
+#   - images-grid-comfy-plugin: Image grid utilities
+#   - ComfyUI-Image-Saver: Enhanced image saving
+#   - ComfyUI_UltimateSDUpscale: Ultimate SD upscaling
+#   - ComfyUI-KJNodes: KJ's node collection
+#   - ComfyUI_essentials: Essential utilities
+#   - ComfyUI-Custom-Scripts: Custom script nodes
+#   - ComfyUI_Comfyroll_CustomNodes: Comfyroll collection
+#   - efficiency-nodes-comfyui: Efficiency workflow nodes
+#   - was-node-suite-comfyui: WAS node suite
+#   - ComfyUI-mxToolkit: MX toolkit nodes
+#   - ComfyUI-SafeCLIP-SDXL: Safe CLIP encoding for SDXL (vendored)
+#
+# Note: ComfyUI-Manager is excluded (ships with ComfyUI now).
+# Note: ComfyUI-Impact-Pack and Subpack are separate packages.
+#
+# Version tracks ComfyUI release for compatibility.
+
+{ lib
+, stdenv
+, fetchFromGitHub
+}:
+
+let
+  # Define all custom node sources
+  nodeSources = {
+    rgthree-comfy = fetchFromGitHub {
+      owner = "rgthree";
+      repo = "rgthree-comfy";
+      rev = "v.1.0.0";
+      hash = "sha256-bzQcQ37v7ZrHDitZV6z3h/kdNbWxpLxNSvh0rSxnLss=";
+    };
+
+    images-grid-comfy-plugin = fetchFromGitHub {
+      owner = "LEv145";
+      repo = "images-grid-comfy-plugin";
+      rev = "2.6";
+      hash = "sha256-YG08pF6Z44y/gcS9MrCD/X6KqG99ig+VKLfZOd49w9s=";
+    };
+
+    ComfyUI-Image-Saver = fetchFromGitHub {
+      owner = "alexopus";
+      repo = "ComfyUI-Image-Saver";
+      rev = "v1.21.0";
+      hash = "sha256-W0w3+T6Ui2yDDXfJojYS79q+xRhTRvQEjiL1V3QQ/B4=";
+    };
+
+    ComfyUI_UltimateSDUpscale = fetchFromGitHub {
+      owner = "ssitu";
+      repo = "ComfyUI_UltimateSDUpscale";
+      rev = "177019948d900fcd97e5b4167ceae259dd9dd312";
+      hash = "sha256-bw1hcRAhNV1dzSZv2IpblBIu4pR6H8KatF0tLLAmnW4=";
+    };
+
+    ComfyUI-KJNodes = fetchFromGitHub {
+      owner = "kijai";
+      repo = "ComfyUI-KJNodes";
+      rev = "4d68afac6b7079c3980c8b4845b4a47eb5c6660d";
+      hash = "sha256-vRUCrWdaRNLz4ETrJNSxGLTncq2MJzSk6wTitkBDaig=";
+    };
+
+    ComfyUI_essentials = fetchFromGitHub {
+      owner = "cubiq";
+      repo = "ComfyUI_essentials";
+      rev = "9d9f4bedfc9f0321c19faf71855e228c93bd0dc9";
+      hash = "sha256-wkwkZVZYqPgbk2G4DFguZ1absVUFRJXYDRqgFrcLrfU=";
+    };
+
+    ComfyUI-Custom-Scripts = fetchFromGitHub {
+      owner = "pythongosssss";
+      repo = "ComfyUI-Custom-Scripts";
+      rev = "f2838ed5e59de4d73cde5c98354b87a8d3200190";
+      hash = "sha256-0DgPrOFXOjQ4K1RKxLQdtGfJHbopP8iovoJqna8d+Gg=";
+    };
+
+    ComfyUI_Comfyroll_CustomNodes = fetchFromGitHub {
+      owner = "Suzie1";
+      repo = "ComfyUI_Comfyroll_CustomNodes";
+      rev = "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca";
+      hash = "sha256-+qhDJ9hawSEg9AGBz8w+UzohMFhgZDOzvenw8xVVyPc=";
+    };
+
+    efficiency-nodes-comfyui = fetchFromGitHub {
+      owner = "jags111";
+      repo = "efficiency-nodes-comfyui";
+      rev = "f0971b5553ead8f6e66bb99564431e2590cd3981";
+      hash = "sha256-F/n/aDjM/EtOLvnBE1SLJtg+8RSrfZ5yXumyuLetaXQ=";
+    };
+
+    was-node-suite-comfyui = fetchFromGitHub {
+      owner = "WASasquatch";
+      repo = "was-node-suite-comfyui";
+      rev = "ea935d1044ae5a26efa54ebeb18fe9020af49a45";
+      hash = "sha256-/qaoURMMkhb789FOpL2PujL2vdROnGkrAjvVBZV5D5c=";
+    };
+
+    ComfyUI-mxToolkit = fetchFromGitHub {
+      owner = "Smirnov75";
+      repo = "ComfyUI-mxToolkit";
+      rev = "7f7a0e584f12078a1c589645d866ae96bad0cc35";
+      hash = "sha256-0vf6rkDzUvsQwhmOHEigq1yUd/VQGFNLwjp9/P9wJ10=";
+    };
+  };
+
+  nodeNames = builtins.attrNames nodeSources;
+
+in stdenv.mkDerivation rec {
+  pname = "comfyui-custom-nodes";
+  version = "0.9.2";  # Tracks ComfyUI version
+
+  # We don't have a single src - we use multiple fetchFromGitHub sources
+  dontUnpack = true;
+  dontBuild = true;
+  dontConfigure = true;
+
+  installPhase = ''
+    runHook preInstall
+
+    # Create directory structure
+    mkdir -p $out/share/comfyui/custom_nodes
+
+    # Install each node from GitHub
+    ${lib.concatStringsSep "\n" (map (name: ''
+      echo "Installing ${name}..."
+      cp -r ${nodeSources.${name}} $out/share/comfyui/custom_nodes/${name}
+      chmod -R u+w $out/share/comfyui/custom_nodes/${name}
+      rm -rf $out/share/comfyui/custom_nodes/${name}/.git
+      rm -rf $out/share/comfyui/custom_nodes/${name}/.github
+    '') nodeNames)}
+
+    # Install vendored SafeCLIP-SDXL
+    echo "Installing ComfyUI-SafeCLIP-SDXL (vendored)..."
+    mkdir -p $out/share/comfyui/custom_nodes/ComfyUI-SafeCLIP-SDXL
+    cp ${../../sources/ComfyUI-SafeCLIP-SDXL/__init__.py} $out/share/comfyui/custom_nodes/ComfyUI-SafeCLIP-SDXL/__init__.py
+
+    runHook postInstall
+  '';
+
+  meta = with lib; {
+    description = "Community custom nodes for ComfyUI";
+    longDescription = ''
+      A curated collection of essential community custom nodes for ComfyUI:
+
+      - rgthree-comfy: Quality-of-life workflow improvements
+      - images-grid-comfy-plugin: Image grid generation utilities
+      - ComfyUI-Image-Saver: Enhanced image saving with metadata
+      - ComfyUI_UltimateSDUpscale: Advanced SD upscaling
+      - ComfyUI-KJNodes: KJ's comprehensive node collection
+      - ComfyUI_essentials: Essential utility nodes
+      - ComfyUI-Custom-Scripts: Custom script and widget nodes
+      - ComfyUI_Comfyroll_CustomNodes: Comfyroll node collection
+      - efficiency-nodes-comfyui: Efficiency workflow nodes
+      - was-node-suite-comfyui: WAS comprehensive node suite
+      - ComfyUI-mxToolkit: MX toolkit nodes
+      - ComfyUI-SafeCLIP-SDXL: Safe CLIP encoding for SDXL
+
+      Note: ComfyUI-Manager is excluded (now ships with ComfyUI).
+      Note: Impact Pack and Subpack are provided by separate packages.
+
+      Version: ${version} (tracks ComfyUI release)
+    '';
+    homepage = "https://github.com/comfyanonymous/ComfyUI";
+    license = licenses.gpl3Only;
+    platforms = platforms.all;
+  };
+}
