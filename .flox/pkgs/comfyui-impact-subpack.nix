@@ -6,23 +6,34 @@
 # Impact Subpack provides:
 #   - UltralyticsDetectorProvider (YOLO-based detection)
 #   - SAMLoader (Segment Anything Model loader)
+#   - SAM2 support (Segment Anything Model 2)
 #   - Additional segmentation utilities
 #
-# Note: Impact Subpack requires:
-#   - ComfyUI-Impact-Pack (provided by comfyui-plugins)
-#   - Python dependencies from comfyui-extras (ultralytics, segment-anything)
+# This package bundles its Python dependencies:
+#   - comfyui-ultralytics (YOLO object detection)
+#   - comfyui-segment-anything (SAM)
+#   - comfyui-sam2 (SAM2)
 #
-# Version tracks ComfyUI release for compatibility.
-# Impact Subpack source version noted in comments.
+# Note: Also requires ComfyUI-Impact-Pack (provided by comfyui-plugins)
+#
+# Version: 1.3.5_flox_build (based on upstream 1.3.4 + bundled Python deps)
 
 { lib
-, stdenv
+, python3
 , fetchFromGitHub
+, callPackage
 }:
 
-stdenv.mkDerivation rec {
+let
+  comfyui-ultralytics = callPackage ./comfyui-ultralytics.nix { };
+  comfyui-segment-anything = callPackage ./segment-anything.nix { };
+  comfyui-sam2 = callPackage ./comfyui-sam2.nix { };
+in
+
+python3.pkgs.buildPythonPackage rec {
   pname = "comfyui-impact-subpack";
-  version = "0.9.1";  # Tracks ComfyUI version
+  version = "1.3.5_flox_build";  # Based on upstream 1.3.4 + bundled Python deps
+  format = "other";  # No Python build system, just source files
 
   # Impact Subpack v1.3.4
   src = fetchFromGitHub {
@@ -32,8 +43,16 @@ stdenv.mkDerivation rec {
     hash = "sha256-BHtfkaqCPf/YXfGbF/xyryjt+M8izkdoUAKNJLfyvqI=";
   };
 
+  # Bundle Python dependencies required by Impact Subpack
+  propagatedBuildInputs = [
+    comfyui-ultralytics       # UltralyticsDetectorProvider
+    comfyui-segment-anything  # SAMLoader
+    comfyui-sam2              # SAM2 support
+  ];
+
   dontBuild = true;
   dontConfigure = true;
+  doCheck = false;
 
   installPhase = ''
     runHook preInstall
@@ -57,16 +76,20 @@ stdenv.mkDerivation rec {
       ComfyUI-Impact-Subpack extends Impact Pack with additional nodes:
       - UltralyticsDetectorProvider: YOLO-based object detection
       - SAMLoader: Segment Anything Model loader
+      - SAM2: Segment Anything Model 2 support
       - Additional segmentation and detection utilities
 
-      Requires:
-      - comfyui-plugins (Impact Pack)
-      - comfyui-extras (ultralytics, segment-anything)
+      This package bundles its Python dependencies:
+      - comfyui-ultralytics
+      - comfyui-segment-anything
+      - comfyui-sam2
 
-      Impact Subpack source version: 1.3.4
+      Also requires comfyui-plugins (Impact Pack source).
+
+      Based on upstream version 1.3.4 with bundled Python dependencies.
     '';
     homepage = "https://github.com/ltdrdata/ComfyUI-Impact-Subpack";
     license = licenses.gpl3Only;
-    platforms = platforms.all;
+    platforms = platforms.unix;
   };
 }
