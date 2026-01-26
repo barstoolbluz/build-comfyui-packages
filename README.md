@@ -21,6 +21,67 @@ When installed from standard channels (pip, conda, nixpkgs), these packages pull
 
 This repo rebuilds torch-dependent packages from source using Nix's `pythonRemoveDeps` to strip torch requirements. At runtime, these packages use whatever PyTorch the environment provides (CUDA, MPS, or CPU).
 
+## Dependency Strategy
+
+Each package in this repo follows a specific dependency pattern:
+
+### What Gets Bundled
+
+Standard Python packages from nixpkgs are included in each package's `dependencies`:
+- numpy, pillow, scipy, opencv, matplotlib, pandas, pyyaml, requests, tqdm, psutil, etc.
+
+These packages have no torch contamination and are safe to bundle.
+
+### What Gets Removed
+
+Packages are stripped via `pythonRemoveDeps` and provided by the runtime environment:
+
+| Removed Dependency | Provided By |
+|--------------------|-------------|
+| `torch` | Runtime's CUDA/MPS/CPU PyTorch |
+| `torchvision` | Runtime's CUDA/MPS/CPU PyTorch |
+| `timm` | `comfyui-timm` (in comfyui-extras) |
+| `accelerate` | `comfyui-accelerate` (in comfyui-extras) |
+| `open_clip_torch` | `comfyui-open-clip-torch` (in comfyui-extras) |
+| `kornia` | Runtime environment (nixpkgs or separate install) |
+| `transformers` | Runtime environment (nixpkgs or separate install) |
+
+### Dependency Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      Runtime Environment                            │
+├─────────────────────────────────────────────────────────────────────┤
+│  CUDA PyTorch          comfyui-extras           nixpkgs            │
+│  ├── torch             ├── comfyui-ultralytics  ├── transformers   │
+│  └── torchvision       ├── comfyui-timm         ├── kornia         │
+│                        ├── comfyui-accelerate   └── (other deps)   │
+│                        ├── comfyui-open-clip-torch                 │
+│                        ├── comfyui-segment-anything                │
+│                        └── (bundled: numpy, pillow, scipy, etc.)   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Example Package Pattern
+
+```nix
+dependencies = with python3.pkgs; [
+  # Bundled: standard Python packages (no torch contamination)
+  numpy
+  pillow
+  scipy
+];
+
+pythonRemoveDeps = [
+  # Removed: provided by runtime's PyTorch
+  "torch"
+  "torchvision"
+  # Removed: provided by comfyui-extras (torch-agnostic rebuilds)
+  "timm"
+  "accelerate"
+];
+```
+
 ## Repository Structure
 
 ```
@@ -219,13 +280,23 @@ python3.pkgs.buildPythonPackage rec {
   build-system = with python3.pkgs; [ setuptools wheel ];
 
   dependencies = with python3.pkgs; [
-    # Include non-torch dependencies
+    # Bundled: standard Python packages (no torch contamination)
     numpy
     pillow
+    pyyaml
+    requests
   ];
 
-  # Remove torch from requirements
-  pythonRemoveDeps = [ "torch" "torchvision" ];
+  # Removed: these are provided by the runtime environment
+  # - torch/torchvision: from runtime's CUDA PyTorch
+  # - Other torch-contaminated packages: from comfyui-extras
+  pythonRemoveDeps = [
+    "torch"
+    "torchvision"
+    # Add any other torch-contaminated deps the package requires
+    # "timm"        # if needed - provided by comfyui-extras
+    # "accelerate"  # if needed - provided by comfyui-extras
+  ];
 
   doCheck = false;
 
