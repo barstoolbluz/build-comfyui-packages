@@ -237,6 +237,25 @@ comfyui-extras.store-path = "/nix/store/...-python3.13-comfyui-extras-1.0.0"
 comfyui-extras.systems = ["x86_64-linux"]
 ```
 
+### Package Priority Configuration
+
+Some meta-packages have dependencies that conflict with other packages in the environment. To resolve these conflicts, assign a `priority` value in the manifest (lower number = higher priority):
+
+```toml
+# Required priority settings for conflict resolution
+comfyui-extras.priority = 1
+comfyui-plugins.priority = 2
+comfyui-impact-subpack.priority = 3
+```
+
+| Package | Priority | Reason |
+|---------|----------|--------|
+| `comfyui-extras` | 1 | Contains authoritative versions of torch-agnostic ML packages |
+| `comfyui-plugins` | 2 | Impact Pack may have conflicting utility scripts |
+| `comfyui-impact-subpack` | 3 | Bundles dependencies also in comfyui-extras |
+
+**Note:** Without priority settings, Flox may fail to activate the environment due to file conflicts between packages.
+
 After updating the manifest, activate the environment:
 
 ```bash
