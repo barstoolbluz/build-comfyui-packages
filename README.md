@@ -300,6 +300,44 @@ src = ../../sources/<package>-<version>.whl;
 format = "wheel";
 ```
 
+## Versioning Policy
+
+This repository follows two versioning conventions depending on the package type:
+
+### Upstream Packages (Official Third-Party Libraries)
+
+Packages that wrap official upstream libraries **retain their upstream version numbers**:
+
+| Package | Version Example | Meaning |
+|---------|-----------------|---------|
+| `comfyui-ultralytics` | `8.3.68` | Upstream ultralytics v8.3.68 |
+| `comfyui-timm` | `1.0.15` | Upstream timm v1.0.15 |
+| `comfyui-segment-anything` | `1.0` | Upstream segment-anything v1.0 |
+| `comfyui-impact-subpack` | `1.3.5_flox_build` | Based on upstream Impact Subpack v1.3.4 |
+
+The `_flox_build` suffix indicates our packaging adds something beyond the upstream source (e.g., bundled dependencies via `propagatedBuildInputs`).
+
+**Rationale**: Using upstream versions makes it clear which version of the underlying library is included, simplifying compatibility tracking and debugging.
+
+### Internal Packages (ComfyUI-Specific Bundles)
+
+Packages that bundle multiple components or are specific to our build infrastructure use **ComfyUI-tracking versions**:
+
+| Package | Version Example | Meaning |
+|---------|-----------------|---------|
+| `comfyui-plugins` | `0.10.0` | Targets ComfyUI v0.10.0 |
+| `comfyui-custom-nodes` | `0.10.0` | Targets ComfyUI v0.10.0 |
+| `comfyui-extras` | `1.0.0` | Meta-package, semantic versioning |
+
+**Rationale**: These packages bundle multiple upstream sources with ComfyUI-specific configuration, so their version reflects the ComfyUI release they're validated against.
+
+### Version Suffix Conventions
+
+| Suffix | Meaning |
+|--------|---------|
+| (none) | Direct upstream version, minimal modifications |
+| `_flox_build` | Upstream version + Flox-specific enhancements (bundled deps, patches) |
+
 ## Branching Strategy
 
 This repository uses a two-track branching model to support both cutting-edge and stable package builds.
