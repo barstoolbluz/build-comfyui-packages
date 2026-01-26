@@ -54,6 +54,6 @@ python3.pkgs.buildPythonPackage rec {
     description = "CLIP Interrogator for ComfyUI (torch/torchvision provided by runtime)";
     homepage = "https://github.com/pharmapsychotic/clip-interrogator";
     license = licenses.mit;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }

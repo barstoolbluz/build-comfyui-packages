@@ -64,6 +64,6 @@ python3.pkgs.buildPythonPackage rec {
     description = "Ultralytics YOLO for ComfyUI (torch/torchvision provided by runtime)";
     homepage = "https://github.com/ultralytics/ultralytics";
     license = licenses.agpl3Only;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }

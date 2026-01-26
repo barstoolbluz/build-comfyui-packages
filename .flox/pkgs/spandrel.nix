@@ -52,6 +52,6 @@ python3.pkgs.buildPythonPackage rec {
     description = "Neural Network Architecture Library for ComfyUI (torch/torchvision provided by runtime)";
     homepage = "https://github.com/chaiNNer-org/spandrel";
     license = licenses.mit;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }

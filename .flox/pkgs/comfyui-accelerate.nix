@@ -48,6 +48,6 @@ python3.pkgs.buildPythonPackage rec {
     description = "Accelerate for ComfyUI (torch provided by runtime)";
     homepage = "https://github.com/huggingface/accelerate";
     license = licenses.asl20;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }

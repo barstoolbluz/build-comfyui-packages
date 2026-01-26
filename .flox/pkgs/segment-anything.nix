@@ -44,6 +44,6 @@ python3.pkgs.buildPythonPackage rec {
     description = "Meta's Segment Anything Model for ComfyUI (torch provided by runtime)";
     homepage = "https://github.com/facebookresearch/segment-anything";
     license = licenses.asl20;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }
