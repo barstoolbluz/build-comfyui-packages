@@ -55,6 +55,6 @@ python3.pkgs.buildPythonPackage rec {
     description = "OpenAI CLIP for ComfyUI (torch/torchvision provided by runtime)";
     homepage = "https://github.com/mlfoundations/open_clip";
     license = licenses.asl20;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }

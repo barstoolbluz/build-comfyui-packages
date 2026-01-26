@@ -45,6 +45,6 @@ python3.pkgs.buildPythonPackage rec {
     description = "PyTorch Image Models for ComfyUI (torch/torchvision provided by runtime)";
     homepage = "https://huggingface.co/docs/timm/index";
     license = licenses.asl20;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }
