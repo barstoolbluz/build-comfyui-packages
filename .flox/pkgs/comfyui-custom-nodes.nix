@@ -25,6 +25,12 @@
 # Build-time patches applied:
 #   - ComfyUI_Comfyroll_CustomNodes: Fix Python 3.12+ SyntaxWarnings
 #     (invalid escape sequences \W and \R in string literals)
+#   - rgthree-comfy: Fix Python 3.12+ SyntaxWarning
+#     (invalid escape sequence \d in regex pattern - add raw string prefix)
+#   - ComfyUI_essentials: Fix Python 3.12+ SyntaxWarnings
+#     (invalid escape sequences \. in docstring regex examples)
+#   - ComfyUI-Custom-Scripts: Use COMFYUI_BASE_DIR env var for web directory
+#     (allows writing to runtime dir instead of read-only Nix store)
 #
 # Version tracks ComfyUI release for compatibility.
 
@@ -169,6 +175,34 @@ in stdenv.mkDerivation rec {
 
     substituteInPlace "$comfyroll_dir/nodes/nodes_xygrid.py" \
       --replace-fail 'fonts\Roboto-Regular.ttf' 'fonts/Roboto-Regular.ttf'
+
+    # Patch rgthree-comfy for Python 3.12+ compatibility
+    # Fixes invalid escape sequence \d in regex pattern
+    echo "Patching rgthree-comfy for Python 3.12+ compatibility..."
+    rgthree_dir="$out/share/comfyui/custom_nodes/rgthree-comfy"
+
+    substituteInPlace "$rgthree_dir/py/power_prompt.py" \
+      --replace-fail "pattern='<lora:" "pattern=r'<lora:"
+
+    # Patch ComfyUI_essentials for Python 3.12+ compatibility
+    # Fixes invalid escape sequences in docstring regex examples
+    echo "Patching ComfyUI_essentials for Python 3.12+ compatibility..."
+    essentials_dir="$out/share/comfyui/custom_nodes/ComfyUI_essentials"
+
+    substituteInPlace "$essentials_dir/conditioning.py" \
+      --replace-fail 'double_blocks\.0\.' 'double_blocks\\.0\\.' \
+      --replace-fail 'single_blocks\.0\.' 'single_blocks\\.0\\.' \
+      --replace-fail '(img|txt)_(mod|attn|mlp)\.' '(img|txt)_(mod|attn|mlp)\\.' \
+      --replace-fail '(lin|qkv|proj|0|2)\.' '(lin|qkv|proj|0|2)\\.' \
+      --replace-fail '(linear[12]|modulation\.lin)\.' '(linear[12]|modulation\\.lin)\\.'
+
+    # Patch ComfyUI-Custom-Scripts to use COMFYUI_BASE_DIR env var
+    # This allows the node to write to runtime web directory instead of read-only store
+    echo "Patching ComfyUI-Custom-Scripts for Flox/Nix compatibility..."
+    customscripts_dir="$out/share/comfyui/custom_nodes/ComfyUI-Custom-Scripts"
+
+    substituteInPlace "$customscripts_dir/pysssss.py" \
+      --replace-fail 'dir = os.path.dirname(inspect.getfile(PromptServer))' 'dir = os.environ.get("COMFYUI_BASE_DIR", os.path.dirname(inspect.getfile(PromptServer)))'
 
     runHook postInstall
   '';
