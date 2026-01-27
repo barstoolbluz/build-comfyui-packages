@@ -14,14 +14,14 @@
 
 python3.pkgs.buildPythonPackage rec {
   pname = "comfyui-ultralytics";
-  version = "0.10.0";
+  version = "8.3.68";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "ultralytics";
     repo = "ultralytics";
     rev = "v${version}";
-    hash = "sha256-it9yxKXcFF6qO+np0ii6Sg8JymqXAqhk8KJnl9upmgs=";
+    hash = "sha256-9JIAudZk9kSos4mikleOmSZt5CdtTCFK2pvJD6B3BmE=";
   };
 
   build-system = with python3.pkgs; [
@@ -39,6 +39,7 @@ python3.pkgs.buildPythonPackage rec {
     requests
     scipy
     psutil
+    seaborn
     # Removed: polars (not essential, causes issues)
     # Removed: ultralytics-thop (pulls in torch)
     tqdm
