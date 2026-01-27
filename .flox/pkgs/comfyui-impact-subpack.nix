@@ -10,6 +10,7 @@
 #   - Additional segmentation utilities
 #
 # This package bundles its Python dependencies:
+#   - comfyui-thop (PyTorch model profiler, required by ultralytics)
 #   - comfyui-ultralytics (YOLO object detection)
 #   - comfyui-segment-anything (SAM)
 #   - comfyui-sam2 (SAM2)
@@ -25,6 +26,7 @@
 }:
 
 let
+  comfyui-thop = callPackage ./comfyui-thop.nix { };
   comfyui-ultralytics = callPackage ./comfyui-ultralytics.nix { };
   comfyui-segment-anything = callPackage ./segment-anything.nix { };
   comfyui-sam2 = callPackage ./comfyui-sam2.nix { };
@@ -45,6 +47,7 @@ python3.pkgs.buildPythonPackage rec {
 
   # Bundle Python dependencies required by Impact Subpack
   propagatedBuildInputs = [
+    comfyui-thop              # PyTorch model profiler (required by ultralytics)
     comfyui-ultralytics       # UltralyticsDetectorProvider
     comfyui-segment-anything  # SAMLoader
     comfyui-sam2              # SAM2 support

@@ -15,10 +15,22 @@
 #   - efficiency-nodes-comfyui: Efficiency workflow nodes
 #   - was-node-suite-comfyui: WAS node suite
 #   - ComfyUI-mxToolkit: MX toolkit nodes
+#   - ComfyUI_IPAdapter_plus: IPAdapter image-to-image conditioning
+#   - ComfyUI-IPAdapter-Flux: IPAdapter for FLUX models
 #   - ComfyUI-SafeCLIP-SDXL: Safe CLIP encoding for SDXL (vendored)
 #
 # Note: ComfyUI-Manager is excluded (ships with ComfyUI now).
 # Note: ComfyUI-Impact-Pack and Subpack are separate packages.
+#
+# Build-time patches applied:
+#   - ComfyUI_Comfyroll_CustomNodes: Fix Python 3.12+ SyntaxWarnings
+#     (invalid escape sequences \W and \R in string literals)
+#   - rgthree-comfy: Fix Python 3.12+ SyntaxWarning
+#     (invalid escape sequence \d in regex pattern - add raw string prefix)
+#   - ComfyUI_essentials: Fix Python 3.12+ SyntaxWarnings
+#     (invalid escape sequences \. in docstring regex examples)
+#   - ComfyUI-Custom-Scripts: Use COMFYUI_BASE_DIR env var for web directory
+#     (allows writing to runtime dir instead of read-only Nix store)
 #
 # Version tracks ComfyUI release for compatibility.
 
@@ -106,6 +118,20 @@ let
       rev = "7f7a0e584f12078a1c589645d866ae96bad0cc35";
       hash = "sha256-0vf6rkDzUvsQwhmOHEigq1yUd/VQGFNLwjp9/P9wJ10=";
     };
+
+    ComfyUI_IPAdapter_plus = fetchFromGitHub {
+      owner = "cubiq";
+      repo = "ComfyUI_IPAdapter_plus";
+      rev = "a0f451a5113cf9becb0847b92884cb10cbdec0ef";
+      hash = "sha256-Ft9WJcmjzon2tAMJq5na24iqYTnQWEQFSKUElSVwYgw=";
+    };
+
+    ComfyUI-IPAdapter-Flux = fetchFromGitHub {
+      owner = "Shakker-Labs";
+      repo = "ComfyUI-IPAdapter-Flux";
+      rev = "eef22b6875ddaf10f13657248b8123d6bdec2014";
+      hash = "sha256-sd/krgeQAw19nz6oYUrjXq1KiXMnJ2jV7LjL++AiaA0=";
+    };
   };
 
   nodeNames = builtins.attrNames nodeSources;
@@ -139,6 +165,45 @@ in stdenv.mkDerivation rec {
     mkdir -p $out/share/comfyui/custom_nodes/ComfyUI-SafeCLIP-SDXL
     cp ${../../sources/ComfyUI-SafeCLIP-SDXL/__init__.py} $out/share/comfyui/custom_nodes/ComfyUI-SafeCLIP-SDXL/__init__.py
 
+    # Patch ComfyUI_Comfyroll_CustomNodes for Python 3.12+ compatibility
+    # Fixes invalid escape sequences (\W, \R) that cause SyntaxWarnings
+    echo "Patching ComfyUI_Comfyroll_CustomNodes for Python 3.12+ compatibility..."
+    comfyroll_dir="$out/share/comfyui/custom_nodes/ComfyUI_Comfyroll_CustomNodes"
+
+    substituteInPlace "$comfyroll_dir/nodes/nodes_list.py" \
+      --replace-fail 'C:\Windows\Fonts' 'C:/Windows/Fonts'
+
+    substituteInPlace "$comfyroll_dir/nodes/nodes_xygrid.py" \
+      --replace-fail 'fonts\Roboto-Regular.ttf' 'fonts/Roboto-Regular.ttf'
+
+    # Patch rgthree-comfy for Python 3.12+ compatibility
+    # Fixes invalid escape sequence \d in regex pattern
+    echo "Patching rgthree-comfy for Python 3.12+ compatibility..."
+    rgthree_dir="$out/share/comfyui/custom_nodes/rgthree-comfy"
+
+    substituteInPlace "$rgthree_dir/py/power_prompt.py" \
+      --replace-fail "pattern='<lora:" "pattern=r'<lora:"
+
+    # Patch ComfyUI_essentials for Python 3.12+ compatibility
+    # Fixes invalid escape sequences in docstring regex examples
+    echo "Patching ComfyUI_essentials for Python 3.12+ compatibility..."
+    essentials_dir="$out/share/comfyui/custom_nodes/ComfyUI_essentials"
+
+    substituteInPlace "$essentials_dir/conditioning.py" \
+      --replace-fail 'double_blocks\.0\.' 'double_blocks\\.0\\.' \
+      --replace-fail 'single_blocks\.0\.' 'single_blocks\\.0\\.' \
+      --replace-fail '(img|txt)_(mod|attn|mlp)\.' '(img|txt)_(mod|attn|mlp)\\.' \
+      --replace-fail '(lin|qkv|proj|0|2)\.' '(lin|qkv|proj|0|2)\\.' \
+      --replace-fail '(linear[12]|modulation\.lin)\.' '(linear[12]|modulation\\.lin)\\.'
+
+    # Patch ComfyUI-Custom-Scripts to use COMFYUI_BASE_DIR env var
+    # This allows the node to write to runtime web directory instead of read-only store
+    echo "Patching ComfyUI-Custom-Scripts for Flox/Nix compatibility..."
+    customscripts_dir="$out/share/comfyui/custom_nodes/ComfyUI-Custom-Scripts"
+
+    substituteInPlace "$customscripts_dir/pysssss.py" \
+      --replace-fail 'dir = os.path.dirname(inspect.getfile(PromptServer))' 'dir = os.environ.get("COMFYUI_BASE_DIR", os.path.dirname(inspect.getfile(PromptServer)))'
+
     runHook postInstall
   '';
 
@@ -158,6 +223,8 @@ in stdenv.mkDerivation rec {
       - efficiency-nodes-comfyui: Efficiency workflow nodes
       - was-node-suite-comfyui: WAS comprehensive node suite
       - ComfyUI-mxToolkit: MX toolkit nodes
+      - ComfyUI_IPAdapter_plus: IPAdapter image-to-image conditioning
+      - ComfyUI-IPAdapter-Flux: IPAdapter for FLUX models
       - ComfyUI-SafeCLIP-SDXL: Safe CLIP encoding for SDXL
 
       Note: ComfyUI-Manager is excluded (now ships with ComfyUI).
