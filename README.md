@@ -173,6 +173,21 @@ Bundles 14 essential community custom nodes:
 
 **Note:** `comfyui-extras` and `comfyui-plugins` are **x86_64-linux only** due to torch-agnostic ML package constraints.
 
+### Build-Time Patches
+
+Some upstream packages require patches to build correctly or run without warnings. These patches are applied automatically during the Nix build using `substituteInPlace --replace-fail` (which fails the build if the pattern isn't found, catching upstream changes).
+
+#### ComfyUI_Comfyroll_CustomNodes
+
+Fixes Python 3.12+ SyntaxWarnings caused by invalid escape sequences in string literals:
+
+| File | Original | Patched | Reason |
+|------|----------|---------|--------|
+| `nodes/nodes_list.py` | `C:\Windows\Fonts` | `C:/Windows/Fonts` | `\W` is invalid escape |
+| `nodes/nodes_xygrid.py` | `fonts\Roboto-Regular.ttf` | `fonts/Roboto-Regular.ttf` | `\R` is invalid escape |
+
+These are Windows-style paths in string literals that worked in Python <3.12 but now trigger `SyntaxWarning: invalid escape sequence`. The forward slash replacement is cross-platform compatible and functionally equivalent.
+
 ### Platform Support Summary
 
 | Category | x86_64-linux | aarch64-linux | x86_64-darwin | aarch64-darwin |

@@ -22,6 +22,10 @@
 # Note: ComfyUI-Manager is excluded (ships with ComfyUI now).
 # Note: ComfyUI-Impact-Pack and Subpack are separate packages.
 #
+# Build-time patches applied:
+#   - ComfyUI_Comfyroll_CustomNodes: Fix Python 3.12+ SyntaxWarnings
+#     (invalid escape sequences \W and \R in string literals)
+#
 # Version tracks ComfyUI release for compatibility.
 
 { lib
@@ -154,6 +158,17 @@ in stdenv.mkDerivation rec {
     echo "Installing ComfyUI-SafeCLIP-SDXL (vendored)..."
     mkdir -p $out/share/comfyui/custom_nodes/ComfyUI-SafeCLIP-SDXL
     cp ${../../sources/ComfyUI-SafeCLIP-SDXL/__init__.py} $out/share/comfyui/custom_nodes/ComfyUI-SafeCLIP-SDXL/__init__.py
+
+    # Patch ComfyUI_Comfyroll_CustomNodes for Python 3.12+ compatibility
+    # Fixes invalid escape sequences (\W, \R) that cause SyntaxWarnings
+    echo "Patching ComfyUI_Comfyroll_CustomNodes for Python 3.12+ compatibility..."
+    comfyroll_dir="$out/share/comfyui/custom_nodes/ComfyUI_Comfyroll_CustomNodes"
+
+    substituteInPlace "$comfyroll_dir/nodes/nodes_list.py" \
+      --replace-fail 'C:\Windows\Fonts' 'C:/Windows/Fonts'
+
+    substituteInPlace "$comfyroll_dir/nodes/nodes_xygrid.py" \
+      --replace-fail 'fonts\Roboto-Regular.ttf' 'fonts/Roboto-Regular.ttf'
 
     runHook postInstall
   '';
