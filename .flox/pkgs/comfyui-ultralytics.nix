@@ -47,12 +47,13 @@ python3.pkgs.buildPythonPackage rec {
     pandas
   ];
 
-  # Remove torch/torchvision from package requirements entirely
-  # This ensures they won't be pulled in as transitive deps
+  # Remove torch/torchvision and relax version constraints
+  # numpy is still provided via dependencies, just without the <2.0.0 constraint
   pythonRemoveDeps = [
     "torch"
     "torchvision"
     "ultralytics-thop"  # This pulls in torch, remove it
+    "numpy"             # Remove version constraint (<2.0.0), we provide numpy via dependencies
   ];
 
   # Disable tests - they require downloading models and torch
