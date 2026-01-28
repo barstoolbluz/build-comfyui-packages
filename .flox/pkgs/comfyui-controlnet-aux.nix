@@ -25,6 +25,7 @@
 , python3
 , fetchFromGitHub
 , callPackage
+, stdenv
 }:
 
 let
@@ -75,6 +76,8 @@ python3.pkgs.buildPythonPackage rec {
     opencv4             # OpenCV
     pillow              # PIL
     numpy               # NumPy
+  ] ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
+    # Broken on Darwin due to test failures
     albumentations      # Image augmentation library
   ] ++ [
     # Torch-agnostic dependencies (rebuilt without torch)
