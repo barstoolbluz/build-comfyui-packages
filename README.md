@@ -120,6 +120,8 @@ These packages normally depend on PyTorch but are rebuilt without it:
 | `comfyui-transparent-background` | ML-based background removal | x86_64-linux, Darwin | [plemeri/transparent-background](https://github.com/plemeri/transparent-background) |
 | `comfyui-pixeloe` | Pixel art conversion | x86_64-linux, Darwin | [KohakuBlueleaf/PixelOE](https://github.com/KohakuBlueleaf/PixelOE) |
 | `comfyui-spandrel` | Upscaler architectures | Linux | [chaiNNer-org/spandrel](https://github.com/chaiNNer-org/spandrel) |
+| `comfyui-peft` | Parameter-efficient fine-tuning | Linux | [huggingface/peft](https://github.com/huggingface/peft) |
+| `comfyui-facexlib` | Face processing library | Linux | [xinntao/facexlib](https://github.com/xinntao/facexlib) |
 
 ### Standalone Custom Node Packages
 
@@ -128,8 +130,11 @@ These are custom node packages with their own Python dependencies, built separat
 | Package | Description | Platforms | Source |
 |---------|-------------|-----------|--------|
 | `comfyui-controlnet-aux` | ControlNet preprocessors (Canny, Depth, Pose, etc.) | x86_64-linux | [Fannovel16/comfyui_controlnet_aux](https://github.com/Fannovel16/comfyui_controlnet_aux) |
+| `comfyui-nunchaku` | 4-bit quantized FLUX/SDXL inference | Linux | [mit-han-lab/ComfyUI-nunchaku](https://github.com/mit-han-lab/ComfyUI-nunchaku) |
 
 **Note:** `comfyui-controlnet-aux` excludes MediaPipe (not in nixpkgs). DWPose and some face detection nodes require manual mediapipe installation.
+
+**Note:** `comfyui-nunchaku` provides the ComfyUI nodes only. The nunchaku inference engine must be installed separately (`pip install nunchaku`) as it requires matching CUDA/torch versions.
 
 ### Clean Packages
 
@@ -143,6 +148,7 @@ These packages have no torch dependencies but aren't in nixpkgs or need specific
 | `color-matcher` | Color matching algorithms | Vendored wheel |
 | `img2texture` | Seamless texture generation | Vendored tarball |
 | `cstr` | Colored terminal strings | Vendored tarball |
+| `pyloudnorm` | Audio loudness normalization | [csteinmetz1/pyloudnorm](https://github.com/csteinmetz1/pyloudnorm) |
 
 ### Meta-Packages
 
@@ -153,12 +159,13 @@ This repository provides four meta-packages that aggregate different categories 
 | `comfyui-extras` | Torch-agnostic ML packages + clean utilities | x86_64-linux |
 | `comfyui-plugins` | Impact Pack (FaceDetailer, detection nodes) | x86_64-linux |
 | `comfyui-impact-subpack` | Impact Subpack (YOLO detector, SAM loader) | x86_64-linux |
+| `comfyui-videogen` | 4 video generation custom nodes from GitHub | All platforms |
 | `comfyui-custom-nodes` | 15 community custom nodes from GitHub | All platforms |
 
 #### comfyui-extras
 
 Aggregates all torch-agnostic ML packages plus these from nixpkgs:
-- piexif, simpleeval, numba, gitpython, onnxruntime, easydict, pymatting, pillow-heif, rich, albumentations
+- piexif, simpleeval, numba, gitpython, onnxruntime, easydict, pymatting, pillow-heif, rich, albumentations, imageio-ffmpeg
 
 #### comfyui-plugins
 
@@ -167,6 +174,13 @@ Provides ComfyUI-Impact-Pack, the essential custom node collection with FaceDeta
 #### comfyui-impact-subpack
 
 Provides ComfyUI-Impact-Subpack with UltralyticsDetectorProvider (YOLO detection) and SAMLoader nodes. Requires `comfyui-plugins` (Impact Pack) and `comfyui-extras` for Python dependencies.
+
+#### comfyui-videogen
+
+Bundles 4 video generation/processing custom nodes:
+- ComfyUI-AnimateDiff-Evolved, ComfyUI-VideoHelperSuite, ComfyUI-LTXVideo, ComfyUI-WanVideoWrapper
+
+Python dependencies (peft, facexlib, pyloudnorm, imageio-ffmpeg) are provided by `comfyui-extras`. Runtime manifest provides diffusers, transformers, av (PyAV), and ffmpeg.
 
 #### comfyui-custom-nodes
 
