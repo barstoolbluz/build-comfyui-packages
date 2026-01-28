@@ -130,11 +130,8 @@ These are custom node packages with their own Python dependencies, built separat
 | Package | Description | Platforms | Source |
 |---------|-------------|-----------|--------|
 | `comfyui-controlnet-aux` | ControlNet preprocessors (Canny, Depth, Pose, etc.) | x86_64-linux | [Fannovel16/comfyui_controlnet_aux](https://github.com/Fannovel16/comfyui_controlnet_aux) |
-| `comfyui-nunchaku` | 4-bit quantized FLUX/SDXL inference | Linux | [mit-han-lab/ComfyUI-nunchaku](https://github.com/mit-han-lab/ComfyUI-nunchaku) |
 
 **Note:** `comfyui-controlnet-aux` excludes MediaPipe (not in nixpkgs). DWPose and some face detection nodes require manual mediapipe installation.
-
-**Note:** `comfyui-nunchaku` provides the ComfyUI nodes only. The nunchaku inference engine must be installed separately (`pip install nunchaku`) as it requires matching CUDA/torch versions.
 
 ### Clean Packages
 
