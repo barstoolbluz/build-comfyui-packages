@@ -53,6 +53,7 @@ let
   comfyui-clip-interrogator = callPackage ./comfyui-clip-interrogator.nix { };
   comfyui-transparent-background = callPackage ./comfyui-transparent-background.nix { };
   comfyui-pixeloe = callPackage ./comfyui-pixeloe.nix { };
+  comfyui-spandrel = callPackage ./spandrel.nix { };
 
   # Clean packages (no torch dependencies)
   colour-science = callPackage ./colour-science.nix { };
@@ -95,6 +96,7 @@ python3.pkgs.buildPythonPackage rec {
     comfyui-accelerate        # HuggingFace Accelerate
     comfyui-segment-anything  # Meta SAM segmentation
     comfyui-clip-interrogator # Image to prompt
+    comfyui-spandrel          # Upscaler model architectures
     colour-science            # Color science library
     rembg                     # Background removal
     ffmpy                     # FFmpeg wrapper
