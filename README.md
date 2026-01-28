@@ -119,11 +119,6 @@ These packages normally depend on PyTorch but are rebuilt without it:
 | `comfyui-clip-interrogator` | Image to prompt | Linux | [pharmapsychotic/clip-interrogator](https://github.com/pharmapsychotic/clip-interrogator) |
 | `comfyui-transparent-background` | ML-based background removal | x86_64-linux, Darwin | [plemeri/transparent-background](https://github.com/plemeri/transparent-background) |
 | `comfyui-pixeloe` | Pixel art conversion | x86_64-linux, Darwin | [KohakuBlueleaf/PixelOE](https://github.com/KohakuBlueleaf/PixelOE) |
-
-**Built separately (not in meta-package):**
-
-| Package | Description | Platforms | Source |
-|---------|-------------|-----------|--------|
 | `comfyui-spandrel` | Upscaler architectures | Linux | [chaiNNer-org/spandrel](https://github.com/chaiNNer-org/spandrel) |
 
 ### Standalone Custom Node Packages
@@ -162,7 +157,7 @@ This repository provides four meta-packages that aggregate different categories 
 
 #### comfyui-extras
 
-Aggregates all torch-agnostic ML packages (except spandrel) plus these from nixpkgs:
+Aggregates all torch-agnostic ML packages plus these from nixpkgs:
 - piexif, simpleeval, numba, gitpython, onnxruntime, easydict, pymatting, pillow-heif, rich, albumentations
 
 #### comfyui-plugins
