@@ -5,6 +5,7 @@
 { lib
 , python3
 , fetchFromGitHub
+, onnxruntime-noexecstack ? null
 }:
 
 python3.pkgs.buildPythonPackage rec {
@@ -41,8 +42,8 @@ python3.pkgs.buildPythonPackage rec {
     click
     filetype
     imagehash
-    # CPU runtime
-    onnxruntime
+    # CPU runtime (use patched version if available)
+    (if onnxruntime-noexecstack != null then onnxruntime-noexecstack else onnxruntime)
   ];
 
   # Remove opencv-python-headless (we provide opencv4 instead)
