@@ -126,6 +126,16 @@ These packages normally depend on PyTorch but are rebuilt without it:
 |---------|-------------|-----------|--------|
 | `comfyui-spandrel` | Upscaler architectures | Linux | [chaiNNer-org/spandrel](https://github.com/chaiNNer-org/spandrel) |
 
+### Standalone Custom Node Packages
+
+These are custom node packages with their own Python dependencies, built separately from `comfyui-custom-nodes`:
+
+| Package | Description | Platforms | Source |
+|---------|-------------|-----------|--------|
+| `comfyui-controlnet-aux` | ControlNet preprocessors (Canny, Depth, Pose, etc.) | x86_64-linux | [Fannovel16/comfyui_controlnet_aux](https://github.com/Fannovel16/comfyui_controlnet_aux) |
+
+**Note:** `comfyui-controlnet-aux` excludes MediaPipe (not in nixpkgs). DWPose and some face detection nodes require manual mediapipe installation.
+
 ### Clean Packages
 
 These packages have no torch dependencies but aren't in nixpkgs or need specific versions:
@@ -148,7 +158,7 @@ This repository provides four meta-packages that aggregate different categories 
 | `comfyui-extras` | Torch-agnostic ML packages + clean utilities | x86_64-linux |
 | `comfyui-plugins` | Impact Pack (FaceDetailer, detection nodes) | x86_64-linux |
 | `comfyui-impact-subpack` | Impact Subpack (YOLO detector, SAM loader) | x86_64-linux |
-| `comfyui-custom-nodes` | 14 community custom nodes from GitHub | All platforms |
+| `comfyui-custom-nodes` | 15 community custom nodes from GitHub | All platforms |
 
 #### comfyui-extras
 
@@ -165,11 +175,12 @@ Provides ComfyUI-Impact-Subpack with UltralyticsDetectorProvider (YOLO detection
 
 #### comfyui-custom-nodes
 
-Bundles 14 essential community custom nodes:
+Bundles 15 essential community custom nodes:
 - rgthree-comfy, images-grid-comfy-plugin, ComfyUI-Image-Saver, ComfyUI_UltimateSDUpscale
 - ComfyUI-KJNodes, ComfyUI_essentials, ComfyUI-Custom-Scripts, ComfyUI_Comfyroll_CustomNodes
 - efficiency-nodes-comfyui, was-node-suite-comfyui, ComfyUI-mxToolkit
 - ComfyUI_IPAdapter_plus, ComfyUI-IPAdapter-Flux, ComfyUI-SafeCLIP-SDXL
+- Comfyui-LayerForge (Photoshop-like layer editor)
 
 **Note:** `comfyui-extras` and `comfyui-plugins` are **x86_64-linux only** due to torch-agnostic ML package constraints.
 
