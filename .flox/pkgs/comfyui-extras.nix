@@ -96,6 +96,7 @@ python3.pkgs.buildPythonPackage rec {
     rich            # Terminal formatting (needed by ComfyUI-Manager)
     imageio-ffmpeg  # FFmpeg wrapper for video I/O
     gguf            # GGUF model format support
+    onnx            # ONNX model format library
   ]) ++ lib.optionals (!stdenv.hostPlatform.isDarwin) (with python3.pkgs; [
     # Broken on Darwin due to stringzilla compilation issues
     albumentations  # Image augmentation library
