@@ -63,10 +63,13 @@ let
   comfyui-peft = callPackage ./comfyui-peft.nix { };
   comfyui-facexlib = callPackage ./comfyui-facexlib.nix { };
 
+  # Patched packages
+  onnxruntime-noexecstack = callPackage ./onnxruntime-noexecstack.nix { };
+
   # Clean packages (no torch dependencies)
   pyloudnorm = callPackage ./pyloudnorm.nix { };
   colour-science = callPackage ./colour-science.nix { };
-  rembg = callPackage ./rembg.nix { };
+  rembg = callPackage ./rembg.nix { inherit onnxruntime-noexecstack; };
   ffmpy = callPackage ./ffmpy.nix { };
   color-matcher = callPackage ./color-matcher.nix { };
   img2texture = callPackage ./img2texture.nix { };
@@ -89,7 +92,6 @@ python3.pkgs.buildPythonPackage rec {
     simpleeval      # Safe expression evaluation
     numba           # JIT compilation for numerical code
     gitpython       # Git repository access
-    onnxruntime     # ONNX model inference
     easydict        # Dict with attribute access
     pymatting       # Image matting algorithms
     pillow-heif     # HEIF/HEIC image support
@@ -118,6 +120,7 @@ python3.pkgs.buildPythonPackage rec {
     comfyui-peft              # Parameter-efficient fine-tuning
     comfyui-facexlib          # Face processing library
     pyloudnorm                # Audio loudness normalization
+    onnxruntime-noexecstack   # ONNX inference (execstack fix for hardened kernels)
   ] ++ lib.optionals (stdenv.hostPlatform.system == "x86_64-linux") [
     # x86_64-linux only (kornia-rs build issues on other platforms)
     comfyui-pixeloe               # Pixel art conversion
