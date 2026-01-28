@@ -32,14 +32,14 @@ let
       owner = "Kosinkadink";
       repo = "ComfyUI-VideoHelperSuite";
       rev = "993082e4f2473bf4acaf06f51e33877a7eb38960";
-      hash = "sha256-JFQlebtw9dVFmWdiFbiDVbWhPdXkXymcicVn4/kUxrA=";
+      hash = "sha256-oII4aAK8O44MBaxOATG7tAXmF1ESRm7nacNmj1E3pE8=";
     };
 
     ComfyUI-LTXVideo = fetchFromGitHub {
       owner = "Lightricks";
       repo = "ComfyUI-LTXVideo";
       rev = "d153ca3f7839759baa7c58c331277451ba760bbb";
-      hash = "sha256-JFQlebtw9dVFmWdiFbiDVbWhPdXkXymcicVn4/kUxrA=";
+      hash = "sha256-LQhw/YNViZcUiX8S4OeBUdiW0SE4ppV6m7gnJkoxf0I=";
     };
 
     ComfyUI-WanVideoWrapper = fetchFromGitHub {
