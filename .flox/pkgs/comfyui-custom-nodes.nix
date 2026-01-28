@@ -18,6 +18,7 @@
 #   - ComfyUI_IPAdapter_plus: IPAdapter image-to-image conditioning
 #   - ComfyUI-IPAdapter-Flux: IPAdapter for FLUX models
 #   - ComfyUI-SafeCLIP-SDXL: Safe CLIP encoding for SDXL (vendored)
+#   - Comfyui-LayerForge: Photoshop-like layer editor for ComfyUI
 #
 # Note: ComfyUI-Manager is excluded (ships with ComfyUI now).
 # Note: ComfyUI-Impact-Pack and Subpack are separate packages.
@@ -132,6 +133,13 @@ let
       rev = "eef22b6875ddaf10f13657248b8123d6bdec2014";
       hash = "sha256-sd/krgeQAw19nz6oYUrjXq1KiXMnJ2jV7LjL++AiaA0=";
     };
+
+    Comfyui-LayerForge = fetchFromGitHub {
+      owner = "Azornes";
+      repo = "Comfyui-LayerForge";
+      rev = "v1.5.11";
+      hash = "sha256-NdZuh7mDTZPk+iyQITo4qVg/c1qxgKAFZB3wLAHCWvE=";
+    };
   };
 
   nodeNames = builtins.attrNames nodeSources;
@@ -226,6 +234,7 @@ in stdenv.mkDerivation rec {
       - ComfyUI_IPAdapter_plus: IPAdapter image-to-image conditioning
       - ComfyUI-IPAdapter-Flux: IPAdapter for FLUX models
       - ComfyUI-SafeCLIP-SDXL: Safe CLIP encoding for SDXL
+      - Comfyui-LayerForge: Photoshop-like layer editor for ComfyUI
 
       Note: ComfyUI-Manager is excluded (now ships with ComfyUI).
       Note: Impact Pack and Subpack are provided by separate packages.
