@@ -28,10 +28,16 @@
 #   - transparent-background (background removal)
 #   - pixeloe (pixel art conversion)
 #   - rembg (background removal)
+#   - peft (parameter-efficient fine-tuning)
+#   - facexlib (face processing)
 #
 # Image Processing:
 #   - colour-science, color-matcher, albumentations, pymatting
 #   - pillow-heif (HEIF/HEIC support)
+#
+# Audio/Video:
+#   - pyloudnorm (audio loudness normalization)
+#   - imageio-ffmpeg (FFmpeg wrapper for video I/O)
 #
 # Utilities:
 #   - ffmpy (FFmpeg wrapper), img2texture, cstr
@@ -54,8 +60,11 @@ let
   comfyui-transparent-background = callPackage ./comfyui-transparent-background.nix { };
   comfyui-pixeloe = callPackage ./comfyui-pixeloe.nix { };
   comfyui-spandrel = callPackage ./spandrel.nix { };
+  comfyui-peft = callPackage ./comfyui-peft.nix { };
+  comfyui-facexlib = callPackage ./comfyui-facexlib.nix { };
 
   # Clean packages (no torch dependencies)
+  pyloudnorm = callPackage ./pyloudnorm.nix { };
   colour-science = callPackage ./colour-science.nix { };
   rembg = callPackage ./rembg.nix { };
   ffmpy = callPackage ./ffmpy.nix { };
@@ -85,6 +94,7 @@ python3.pkgs.buildPythonPackage rec {
     pymatting       # Image matting algorithms
     pillow-heif     # HEIF/HEIC image support
     rich            # Terminal formatting (needed by ComfyUI-Manager)
+    imageio-ffmpeg  # FFmpeg wrapper for video I/O
   ]) ++ lib.optionals (!stdenv.hostPlatform.isDarwin) (with python3.pkgs; [
     # Broken on Darwin due to stringzilla compilation issues
     albumentations  # Image augmentation library
@@ -103,6 +113,9 @@ python3.pkgs.buildPythonPackage rec {
     color-matcher             # Color matching algorithms
     img2texture               # Seamless texture generation
     cstr                      # Colored terminal strings
+    comfyui-peft              # Parameter-efficient fine-tuning
+    comfyui-facexlib          # Face processing library
+    pyloudnorm                # Audio loudness normalization
   ] ++ lib.optionals (stdenv.hostPlatform.system == "x86_64-linux") [
     # x86_64-linux only (kornia-rs build issues on other platforms)
     comfyui-pixeloe               # Pixel art conversion
