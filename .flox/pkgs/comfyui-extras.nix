@@ -78,7 +78,7 @@ in
 
 python3.pkgs.buildPythonPackage rec {
   pname = "comfyui-extras";
-  version = "0.10.0";
+  version = "0.11.0";
   format = "other";
 
   # No source - this is a meta-package
