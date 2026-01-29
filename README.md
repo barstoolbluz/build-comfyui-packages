@@ -205,6 +205,48 @@ Fixes Python 3.12+ SyntaxWarnings caused by invalid escape sequences in string l
 
 These are Windows-style paths in string literals that worked in Python <3.12 but now trigger `SyntaxWarning: invalid escape sequence`. The forward slash replacement is cross-platform compatible and functionally equivalent.
 
+#### onnxruntime-noexecstack
+
+The nixpkgs `onnxruntime` shared library (`onnxruntime_pybind11_state.so`) has its ELF `GNU_STACK` header set to `RWE` (read/write/execute). Hardened kernels (Debian 13+) refuse to load shared libraries with executable stacks:
+
+```
+cannot enable executable stack as shared object requires: Invalid argument
+```
+
+The `onnxruntime-noexecstack` wrapper fixes this by:
+
+1. Copying the nixpkgs onnxruntime package
+2. Patching the ELF `GNU_STACK` flag from `RWE` to `RW` (clearing `PF_X`)
+3. Using `remove-references-to` to strip the Nix reference to the original `python3.pkgs.onnxruntime`, preventing both the patched and unpatched versions from appearing in the environment's `site-packages/` (which would cause a symlink collision where the unpatched version wins)
+
+The C library (`onnxruntime-1.22.0`, providing `lib/libonnxruntime.so`) is retained in the closure — it does not collide because it has no `site-packages/` content.
+
+This is a temporary fix. When nixpkgs corrects the `GNU_STACK` flags upstream, remove `onnxruntime-noexecstack.nix`, revert `rembg.nix` to use `python3.pkgs.onnxruntime` directly, and remove the wrapper from `comfyui-extras.nix`.
+
+### Runtime Behavior
+
+#### Custom Node Installation Patterns
+
+The runtime hook installs custom nodes using two patterns depending on the node's requirements:
+
+**Copied to user directory (writable):** Most custom nodes are copied from the Nix store to `~/comfyui-work/custom_nodes/` and then symlinked into `comfyui-runtime/custom_nodes/`. This allows nodes to write to their own directories at runtime (caches, configs, `__pycache__/`, downloaded models).
+
+**Symlinked read-only to runtime:** Impact Pack and Impact Subpack are symlinked directly from the Nix store to `comfyui-runtime/custom_nodes/`. These nodes have internal model paths and subpack dependencies that resolve relative to their install location — copying them would break those references. Their writable data (models, whitelists) is stored in separate user directories configured via ComfyUI's folder paths.
+
+#### WanVideoWrapper Duplicate Warning
+
+When ComfyUI starts, WanVideoWrapper may emit:
+
+```
+WARNING: Found 1 other WanVideoWrapper directories:
+  - /path/to/comfyui-runtime/custom_nodes/ComfyUI-WanVideoWrapper
+Please remove duplicates to avoid possible conflicts.
+```
+
+This is a false positive. WanVideoWrapper's `check_duplicate_nodes()` scans `comfyui-runtime/custom_nodes/` and compares each entry against `Path(__file__).parent`. The runtime entry is a symlink to the user copy, but `Path.iterdir()` returns the unresolved symlink path while `__file__` resolves to the real user directory path. The two paths point to the same directory but differ as strings, triggering the warning.
+
+**This warning is harmless and can be ignored.** There is only one copy of WanVideoWrapper (in the user directory). The symlink-read-only approach used for Impact Pack cannot be applied here because WanVideoWrapper writes `text_embed_cache/*.pt` files relative to its own `__file__` location, which would fail in the immutable Nix store.
+
 ### Platform Support Summary
 
 | Category | x86_64-linux | aarch64-linux | x86_64-darwin | aarch64-darwin |
