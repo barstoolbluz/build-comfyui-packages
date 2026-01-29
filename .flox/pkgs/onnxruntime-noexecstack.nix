@@ -7,12 +7,18 @@
 # This wrapper copies the nixpkgs onnxruntime and patches the single byte
 # in the ELF header to clear PF_X from GNU_STACK (RWE -> RW).
 #
+# It also removes the Nix-level reference to the original python3.pkgs.onnxruntime
+# so that only this patched copy appears in the environment's site-packages.
+# The C library (onnxruntime-1.22.0) is kept — it provides libonnxruntime.so
+# under lib/ and does not collide.
+#
 # When nixpkgs fixes this upstream, remove this wrapper and use
 # python3.pkgs.onnxruntime directly.
 
 { lib
 , stdenv
 , python3
+, removeReferencesTo
 }:
 
 stdenv.mkDerivation {
@@ -63,10 +69,18 @@ with open("$so", "r+b") as f:
 PYEOF
     done
 
+    # Remove the Nix reference to the original Python onnxruntime package.
+    # Without this, both our patched copy and the original end up in the
+    # environment's site-packages, and the original (unpatched) wins the
+    # symlink collision. The C library (onnxruntime-1.22.0) is NOT removed —
+    # it provides lib/libonnxruntime.so which the .so files need at runtime.
+    find $out -type f -exec remove-references-to \
+      -t ${python3.pkgs.onnxruntime} {} +
+
     runHook postInstall
   '';
 
-  nativeBuildInputs = [ python3 ];
+  nativeBuildInputs = [ python3 removeReferencesTo ];
 
   meta = python3.pkgs.onnxruntime.meta // {
     description = "ONNX Runtime with execstack flag cleared for hardened kernels";
