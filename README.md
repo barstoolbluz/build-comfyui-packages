@@ -21,6 +21,25 @@ When installed from standard channels (pip, conda, nixpkgs), these packages pull
 
 This repo rebuilds torch-dependent packages from source using Nix's `pythonRemoveDeps` to strip torch requirements. At runtime, these packages use whatever PyTorch the environment provides (CUDA, MPS, or CPU).
 
+## Release-Tracked Packages
+
+This repo produces **five meta-packages** consumed by the Flox runtime environment. Four of them are **version-locked to the upstream ComfyUI release** and must be bumped in lockstep when ComfyUI is updated. The runtime manifest (`comfyui/.flox/env/manifest.toml`) also pins these versions and must match.
+
+### Version-Locked (bump together on each ComfyUI release)
+
+| Meta-Package | Build Recipe | Aggregates |
+|--------------|-------------|------------|
+| `comfyui-extras` | [`comfyui-extras.nix`](.flox/pkgs/comfyui-extras.nix) | All torch-agnostic ML packages ([`comfyui-ultralytics`](.flox/pkgs/comfyui-ultralytics.nix), [`comfyui-timm`](.flox/pkgs/timm.nix), [`comfyui-open-clip-torch`](.flox/pkgs/open-clip-torch.nix), [`comfyui-accelerate`](.flox/pkgs/comfyui-accelerate.nix), [`comfyui-segment-anything`](.flox/pkgs/segment-anything.nix), [`comfyui-clip-interrogator`](.flox/pkgs/comfyui-clip-interrogator.nix), [`comfyui-spandrel`](.flox/pkgs/spandrel.nix), [`comfyui-peft`](.flox/pkgs/comfyui-peft.nix), [`comfyui-facexlib`](.flox/pkgs/comfyui-facexlib.nix), [`comfyui-transparent-background`](.flox/pkgs/comfyui-transparent-background.nix), [`comfyui-pixeloe`](.flox/pkgs/comfyui-pixeloe.nix)) + clean utility packages ([`colour-science`](.flox/pkgs/colour-science.nix), [`rembg`](.flox/pkgs/rembg.nix), [`ffmpy`](.flox/pkgs/ffmpy.nix), [`color-matcher`](.flox/pkgs/color-matcher.nix), [`img2texture`](.flox/pkgs/img2texture.nix), [`cstr`](.flox/pkgs/cstr.nix), [`pyloudnorm`](.flox/pkgs/pyloudnorm.nix), [`onnxruntime-noexecstack`](.flox/pkgs/onnxruntime-noexecstack.nix)) + nixpkgs deps (piexif, simpleeval, numba, gitpython, onnx, easydict, pymatting, pillow-heif, rich, albumentations, imageio-ffmpeg, gguf) |
+| `comfyui-plugins` | [`comfyui-plugins.nix`](.flox/pkgs/comfyui-plugins.nix) | ComfyUI-Impact-Pack (FaceDetailer, detection, mask ops, batch processing) |
+| `comfyui-custom-nodes` | [`comfyui-custom-nodes.nix`](.flox/pkgs/comfyui-custom-nodes.nix) | 15 community nodes: rgthree-comfy, images-grid, Image-Saver, UltimateSDUpscale, KJNodes, essentials, Custom-Scripts, Comfyroll, efficiency-nodes, was-node-suite, mxToolkit, IPAdapter_plus, IPAdapter-Flux, SafeCLIP-SDXL, LayerForge |
+| `comfyui-videogen` | [`comfyui-videogen.nix`](.flox/pkgs/comfyui-videogen.nix) | 4 video nodes: AnimateDiff-Evolved, VideoHelperSuite, LTXVideo, WanVideoWrapper |
+
+### Independently Versioned
+
+| Meta-Package | Build Recipe | Version Scheme | Aggregates |
+|--------------|-------------|----------------|------------|
+| `comfyui-impact-subpack` | [`comfyui-impact-subpack.nix`](.flox/pkgs/comfyui-impact-subpack.nix) | Upstream + `_flox_build` suffix | Impact Subpack (UltralyticsDetectorProvider, SAMLoader) + bundled Python deps ([`comfyui-sam2`](.flox/pkgs/comfyui-sam2.nix), [`comfyui-thop`](.flox/pkgs/comfyui-thop.nix)) |
+
 ## Dependency Strategy
 
 Each package in this repo follows a specific dependency pattern:
@@ -105,6 +124,49 @@ build-comfyui-packages/
 
 ## Packages
 
+### Meta-Packages
+
+See [Release-Tracked Packages](#release-tracked-packages) for the version-lockstep requirements and build recipe links.
+
+| Meta-Package | Description | Platforms |
+|--------------|-------------|-----------|
+| `comfyui-extras` | Torch-agnostic ML packages + clean utilities | x86_64-linux |
+| `comfyui-plugins` | Impact Pack (FaceDetailer, detection nodes) | x86_64-linux |
+| `comfyui-impact-subpack` | Impact Subpack (YOLO detector, SAM loader) | x86_64-linux |
+| `comfyui-videogen` | 4 video generation custom nodes from GitHub | All platforms |
+| `comfyui-custom-nodes` | 15 community custom nodes from GitHub | All platforms |
+
+#### comfyui-extras
+
+Aggregates all torch-agnostic ML packages plus these from nixpkgs:
+- piexif, simpleeval, numba, gitpython, onnxruntime, easydict, pymatting, pillow-heif, rich, albumentations, imageio-ffmpeg, gguf, onnx
+
+#### comfyui-plugins
+
+Provides ComfyUI-Impact-Pack, the essential custom node collection with FaceDetailer, object detection, mask operations, and batch processing. Requires `comfyui-extras` for Python dependencies (ultralytics, segment-anything).
+
+#### comfyui-impact-subpack
+
+Provides ComfyUI-Impact-Subpack with UltralyticsDetectorProvider (YOLO detection) and SAMLoader nodes. Bundles [`comfyui-sam2`](.flox/pkgs/comfyui-sam2.nix) and [`comfyui-thop`](.flox/pkgs/comfyui-thop.nix) as Python dependencies. Requires `comfyui-plugins` (Impact Pack) and `comfyui-extras` at runtime.
+
+#### comfyui-videogen
+
+Bundles 4 video generation/processing custom nodes:
+- ComfyUI-AnimateDiff-Evolved, ComfyUI-VideoHelperSuite, ComfyUI-LTXVideo, ComfyUI-WanVideoWrapper
+
+Python dependencies (peft, facexlib, pyloudnorm, imageio-ffmpeg) are provided by `comfyui-extras`. Runtime manifest provides diffusers, transformers, av (PyAV), and ffmpeg.
+
+#### comfyui-custom-nodes
+
+Bundles 15 essential community custom nodes:
+- rgthree-comfy, images-grid-comfy-plugin, ComfyUI-Image-Saver, ComfyUI_UltimateSDUpscale
+- ComfyUI-KJNodes, ComfyUI_essentials, ComfyUI-Custom-Scripts, ComfyUI_Comfyroll_CustomNodes
+- efficiency-nodes-comfyui, was-node-suite-comfyui, ComfyUI-mxToolkit
+- ComfyUI_IPAdapter_plus, ComfyUI-IPAdapter-Flux, ComfyUI-SafeCLIP-SDXL
+- Comfyui-LayerForge (Photoshop-like layer editor)
+
+**Note:** `comfyui-extras` and `comfyui-plugins` are **x86_64-linux only** due to torch-agnostic ML package constraints.
+
 ### Torch-Agnostic ML Packages
 
 These packages normally depend on PyTorch but are rebuilt without it:
@@ -122,6 +184,8 @@ These packages normally depend on PyTorch but are rebuilt without it:
 | `comfyui-spandrel` | Upscaler architectures | Linux | [chaiNNer-org/spandrel](https://github.com/chaiNNer-org/spandrel) |
 | `comfyui-peft` | Parameter-efficient fine-tuning | Linux | [huggingface/peft](https://github.com/huggingface/peft) |
 | `comfyui-facexlib` | Face processing library | Linux | [xinntao/facexlib](https://github.com/xinntao/facexlib) |
+| `comfyui-sam2` | Segment Anything 2 | Linux | [facebookresearch/sam2](https://github.com/facebookresearch/sam2) |
+| `comfyui-thop` | FLOPs counter for PyTorch | Linux | [Lyken17/pytorch-OpCounter](https://github.com/Lyken17/pytorch-OpCounter) |
 
 ### Standalone Custom Node Packages
 
@@ -146,49 +210,6 @@ These packages have no torch dependencies but aren't in nixpkgs or need specific
 | `img2texture` | Seamless texture generation | Vendored tarball |
 | `cstr` | Colored terminal strings | Vendored tarball |
 | `pyloudnorm` | Audio loudness normalization | [csteinmetz1/pyloudnorm](https://github.com/csteinmetz1/pyloudnorm) |
-
-### Meta-Packages
-
-This repository provides four meta-packages that aggregate different categories of ComfyUI dependencies:
-
-| Meta-Package | Description | Platforms |
-|--------------|-------------|-----------|
-| `comfyui-extras` | Torch-agnostic ML packages + clean utilities | x86_64-linux |
-| `comfyui-plugins` | Impact Pack (FaceDetailer, detection nodes) | x86_64-linux |
-| `comfyui-impact-subpack` | Impact Subpack (YOLO detector, SAM loader) | x86_64-linux |
-| `comfyui-videogen` | 4 video generation custom nodes from GitHub | All platforms |
-| `comfyui-custom-nodes` | 15 community custom nodes from GitHub | All platforms |
-
-#### comfyui-extras
-
-Aggregates all torch-agnostic ML packages plus these from nixpkgs:
-- piexif, simpleeval, numba, gitpython, onnxruntime, easydict, pymatting, pillow-heif, rich, albumentations, imageio-ffmpeg
-
-#### comfyui-plugins
-
-Provides ComfyUI-Impact-Pack, the essential custom node collection with FaceDetailer, object detection, mask operations, and batch processing. Requires `comfyui-extras` for Python dependencies (ultralytics, segment-anything).
-
-#### comfyui-impact-subpack
-
-Provides ComfyUI-Impact-Subpack with UltralyticsDetectorProvider (YOLO detection) and SAMLoader nodes. Requires `comfyui-plugins` (Impact Pack) and `comfyui-extras` for Python dependencies.
-
-#### comfyui-videogen
-
-Bundles 4 video generation/processing custom nodes:
-- ComfyUI-AnimateDiff-Evolved, ComfyUI-VideoHelperSuite, ComfyUI-LTXVideo, ComfyUI-WanVideoWrapper
-
-Python dependencies (peft, facexlib, pyloudnorm, imageio-ffmpeg) are provided by `comfyui-extras`. Runtime manifest provides diffusers, transformers, av (PyAV), and ffmpeg.
-
-#### comfyui-custom-nodes
-
-Bundles 15 essential community custom nodes:
-- rgthree-comfy, images-grid-comfy-plugin, ComfyUI-Image-Saver, ComfyUI_UltimateSDUpscale
-- ComfyUI-KJNodes, ComfyUI_essentials, ComfyUI-Custom-Scripts, ComfyUI_Comfyroll_CustomNodes
-- efficiency-nodes-comfyui, was-node-suite-comfyui, ComfyUI-mxToolkit
-- ComfyUI_IPAdapter_plus, ComfyUI-IPAdapter-Flux, ComfyUI-SafeCLIP-SDXL
-- Comfyui-LayerForge (Photoshop-like layer editor)
-
-**Note:** `comfyui-extras` and `comfyui-plugins` are **x86_64-linux only** due to torch-agnostic ML package constraints.
 
 ### Build-Time Patches
 
@@ -307,7 +328,7 @@ Built packages are consumed by the `comfyui-repo` runtime environment via store-
 # In comfyui-repo/.flox/env/manifest.toml
 
 # Reference the built meta-package by its store path
-comfyui-extras.store-path = "/nix/store/...-python3.13-comfyui-extras-1.0.0"
+comfyui-extras.store-path = "/nix/store/...-python3.13-comfyui-extras-0.10.0"
 comfyui-extras.systems = ["x86_64-linux"]
 ```
 
@@ -442,13 +463,14 @@ The `_flox_build` suffix indicates our packaging adds something beyond the upstr
 
 ### Internal Packages (ComfyUI-Specific Bundles)
 
-Packages that bundle multiple components or are specific to our build infrastructure use **ComfyUI-tracking versions**:
+Packages that bundle multiple components or are specific to our build infrastructure use **ComfyUI-tracking versions** (see [Release-Tracked Packages](#release-tracked-packages)):
 
 | Package | Version Example | Meaning |
 |---------|-----------------|---------|
+| `comfyui-extras` | `0.10.0` | Targets ComfyUI v0.10.0 |
 | `comfyui-plugins` | `0.10.0` | Targets ComfyUI v0.10.0 |
 | `comfyui-custom-nodes` | `0.10.0` | Targets ComfyUI v0.10.0 |
-| `comfyui-extras` | `1.0.0` | Meta-package, semantic versioning |
+| `comfyui-videogen` | `0.10.0` | Targets ComfyUI v0.10.0 |
 
 **Rationale**: These packages bundle multiple upstream sources with ComfyUI-specific configuration, so their version reflects the ComfyUI release they're validated against.
 
