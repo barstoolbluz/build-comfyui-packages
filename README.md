@@ -23,7 +23,7 @@ This repo rebuilds torch-dependent packages from source using Nix's `pythonRemov
 
 ## Release-Tracked Packages
 
-This repo produces **five meta-packages** consumed by the Flox runtime environment. Four of them are **version-locked to the upstream ComfyUI release** and must be bumped in lockstep when ComfyUI is updated. The runtime manifest (`comfyui/.flox/env/manifest.toml`) also pins these versions and must match.
+This repo produces **five meta-packages** consumed by the Flox runtime environment. Four of them are **version-locked to the upstream ComfyUI release**: their `version` field in the nix file must be set to the ComfyUI release version (e.g., `version = "0.11.0"` for ComfyUI v0.11.0), and all four must be bumped in lockstep. The runtime manifest (`comfyui/.flox/env/manifest.toml`) also pins these versions and must match.
 
 ### Version-Locked (bump together on each ComfyUI release)
 
