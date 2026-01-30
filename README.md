@@ -39,6 +39,8 @@ This repo produces **five meta-packages** consumed by the Flox runtime environme
 | Meta-Package | Build Recipe | Version Scheme | Aggregates |
 |--------------|-------------|----------------|------------|
 | `comfyui-impact-subpack` | [`comfyui-impact-subpack.nix`](.flox/pkgs/comfyui-impact-subpack.nix) | Upstream + `_flox_build` suffix | Impact Subpack (UltralyticsDetectorProvider, SAMLoader) + bundled Python deps ([`comfyui-sam2`](.flox/pkgs/comfyui-sam2.nix), [`comfyui-thop`](.flox/pkgs/comfyui-thop.nix)) |
+| `comfyui-controlnet-aux` | [`comfyui-controlnet-aux.nix`](.flox/pkgs/comfyui-controlnet-aux.nix) | Upstream | ControlNet preprocessors (Canny, Depth, Pose, etc.) |
+| `comfyui-workflows` | [`comfyui-workflows.nix`](.flox/pkgs/comfyui-workflows.nix) | Own semver (`1.0.0`) | Example workflow JSONs for SD15, SDXL, SD3.5, and FLUX (txt2img, img2img, upscale, LoRA, inpaint, ControlNet) |
 
 ## Dependency Strategy
 
