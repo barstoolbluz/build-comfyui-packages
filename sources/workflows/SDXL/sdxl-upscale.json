@@ -1,109 +1,213 @@
 {
-  "1": {
-    "class_type": "CheckpointLoaderSimple",
-    "inputs": {
-      "ckpt_name": "realvisxl_v51_standard.safetensors"
+  "last_node_id": 10,
+  "last_link_id": 13,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "CheckpointLoaderSimple",
+      "pos": [50, 50],
+      "size": [315, 98],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "slot_index": 0, "links": [1, 2]},
+        {"name": "CLIP", "type": "CLIP", "slot_index": 1, "links": [3, 4]},
+        {"name": "VAE", "type": "VAE", "slot_index": 2, "links": [5, 6]}
+      ],
+      "title": "Load Checkpoint",
+      "properties": {"Node name for S&R": "CheckpointLoaderSimple"},
+      "widgets_values": ["sd_xl_base_1.0.safetensors"]
     },
-    "_meta": {
-      "title": "Load Checkpoint"
-    }
-  },
-  "2": {
-    "class_type": "CLIPTextEncode",
-    "inputs": {
-      "text": "a photograph of a mountain landscape at sunset, detailed, high quality",
-      "clip": ["1", 1]
+    {
+      "id": 2,
+      "type": "CLIPTextEncode",
+      "pos": [400, 50],
+      "size": [400, 200],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip", "type": "CLIP", "link": 3}
+      ],
+      "outputs": [
+        {"name": "CONDITIONING", "type": "CONDITIONING", "slot_index": 0, "links": [7, 8]}
+      ],
+      "title": "CLIP Text Encode (Positive)",
+      "properties": {"Node name for S&R": "CLIPTextEncode"},
+      "widgets_values": ["a photograph of a mountain landscape at sunset, detailed, high quality, professional photography, 4k"],
+      "color": "#232",
+      "bgcolor": "#353"
     },
-    "_meta": {
-      "title": "CLIP Text Encode (Positive)"
-    }
-  },
-  "3": {
-    "class_type": "CLIPTextEncode",
-    "inputs": {
-      "text": "blurry, low quality, distorted",
-      "clip": ["1", 1]
+    {
+      "id": 3,
+      "type": "CLIPTextEncode",
+      "pos": [400, 300],
+      "size": [400, 200],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip", "type": "CLIP", "link": 4}
+      ],
+      "outputs": [
+        {"name": "CONDITIONING", "type": "CONDITIONING", "slot_index": 0, "links": [9, 10]}
+      ],
+      "title": "CLIP Text Encode (Negative)",
+      "properties": {"Node name for S&R": "CLIPTextEncode"},
+      "widgets_values": ["blurry, low quality, distorted, watermark"],
+      "color": "#322",
+      "bgcolor": "#533"
     },
-    "_meta": {
-      "title": "CLIP Text Encode (Negative)"
-    }
-  },
-  "4": {
-    "class_type": "EmptyLatentImage",
-    "inputs": {
-      "width": 1024,
-      "height": 1024,
-      "batch_size": 1
+    {
+      "id": 4,
+      "type": "EmptyLatentImage",
+      "pos": [50, 250],
+      "size": [315, 106],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "slot_index": 0, "links": [11]}
+      ],
+      "title": "Empty Latent Image",
+      "properties": {"Node name for S&R": "EmptyLatentImage"},
+      "widgets_values": [1024, 1024, 1]
     },
-    "_meta": {
-      "title": "Empty Latent Image"
-    }
-  },
-  "5": {
-    "class_type": "KSampler",
-    "inputs": {
-      "seed": 42,
-      "steps": 25,
-      "cfg": 7.0,
-      "sampler_name": "euler",
-      "scheduler": "normal",
-      "denoise": 1.0,
-      "model": ["1", 0],
-      "positive": ["2", 0],
-      "negative": ["3", 0],
-      "latent_image": ["4", 0]
+    {
+      "id": 5,
+      "type": "KSampler",
+      "pos": [850, 50],
+      "size": [315, 474],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 1},
+        {"name": "positive", "type": "CONDITIONING", "link": 7},
+        {"name": "negative", "type": "CONDITIONING", "link": 9},
+        {"name": "latent_image", "type": "LATENT", "link": 11}
+      ],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "slot_index": 0, "links": [12]}
+      ],
+      "title": "KSampler (Base)",
+      "properties": {"Node name for S&R": "KSampler"},
+      "widgets_values": [42, "randomize", 25, 7.0, "euler", "normal", 1.0]
     },
-    "_meta": {
-      "title": "KSampler"
-    }
-  },
-  "6": {
-    "class_type": "VAEDecode",
-    "inputs": {
-      "samples": ["5", 0],
-      "vae": ["1", 2]
+    {
+      "id": 6,
+      "type": "VAEDecode",
+      "pos": [1200, 50],
+      "size": [210, 46],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "samples", "type": "LATENT", "link": 12},
+        {"name": "vae", "type": "VAE", "link": 5}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "slot_index": 0, "links": [13, 14]}
+      ],
+      "title": "VAE Decode",
+      "properties": {"Node name for S&R": "VAEDecode"},
+      "widgets_values": []
     },
-    "_meta": {
-      "title": "VAE Decode"
-    }
-  },
-  "7": {
-    "class_type": "SaveImage",
-    "inputs": {
-      "filename_prefix": "SDXL_txt2img",
-      "images": ["6", 0]
+    {
+      "id": 7,
+      "type": "SaveImage",
+      "pos": [1200, 150],
+      "size": [315, 270],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 13}
+      ],
+      "outputs": [],
+      "title": "Save Base Image",
+      "properties": {},
+      "widgets_values": ["SDXL_base"]
     },
-    "_meta": {
-      "title": "Save Image"
-    }
-  },
-  "8": {
-    "class_type": "UpscaleModelLoader",
-    "inputs": {
-      "model_name": "RealESRGAN_x4plus.pth"
+    {
+      "id": 8,
+      "type": "UpscaleModelLoader",
+      "pos": [50, 420],
+      "size": [315, 58],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "UPSCALE_MODEL", "type": "UPSCALE_MODEL", "slot_index": 0, "links": [15]}
+      ],
+      "title": "Load Upscale Model",
+      "properties": {"Node name for S&R": "UpscaleModelLoader"},
+      "widgets_values": ["4x-UltraSharp.pth"]
     },
-    "_meta": {
-      "title": "Load Upscale Model"
-    }
-  },
-  "9": {
-    "class_type": "ImageUpscaleWithModel",
-    "inputs": {
-      "upscale_model": ["8", 0],
-      "image": ["6", 0]
+    {
+      "id": 9,
+      "type": "UltimateSDUpscale",
+      "pos": [1550, 50],
+      "size": [315, 674],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 14},
+        {"name": "model", "type": "MODEL", "link": 2},
+        {"name": "positive", "type": "CONDITIONING", "link": 8},
+        {"name": "negative", "type": "CONDITIONING", "link": 10},
+        {"name": "vae", "type": "VAE", "link": 6},
+        {"name": "upscale_model", "type": "UPSCALE_MODEL", "link": 15}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "slot_index": 0, "links": [16]}
+      ],
+      "title": "Ultimate SD Upscale (2x)",
+      "properties": {"Node name for S&R": "UltimateSDUpscale"},
+      "widgets_values": [2, 42, "randomize", 20, 7.0, "euler", "normal", 0.25, "Linear", 1024, 1024, 8, 32, "None", 1, 64, 8, 16, true, false]
     },
-    "_meta": {
-      "title": "Upscale Image With Model"
+    {
+      "id": 10,
+      "type": "SaveImage",
+      "pos": [1900, 50],
+      "size": [315, 270],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 16}
+      ],
+      "outputs": [],
+      "title": "Save Upscaled Image",
+      "properties": {},
+      "widgets_values": ["SDXL_upscaled"]
     }
-  },
-  "10": {
-    "class_type": "SaveImage",
-    "inputs": {
-      "filename_prefix": "SDXL_upscaled",
-      "images": ["9", 0]
-    },
-    "_meta": {
-      "title": "Save Upscaled Image"
-    }
-  }
+  ],
+  "links": [
+    [1, 1, 0, 5, 0, "MODEL"],
+    [2, 1, 0, 9, 1, "MODEL"],
+    [3, 1, 1, 2, 0, "CLIP"],
+    [4, 1, 1, 3, 0, "CLIP"],
+    [5, 1, 2, 6, 1, "VAE"],
+    [6, 1, 2, 9, 4, "VAE"],
+    [7, 2, 0, 5, 1, "CONDITIONING"],
+    [8, 2, 0, 9, 2, "CONDITIONING"],
+    [9, 3, 0, 5, 2, "CONDITIONING"],
+    [10, 3, 0, 9, 3, "CONDITIONING"],
+    [11, 4, 0, 5, 3, "LATENT"],
+    [12, 5, 0, 6, 0, "LATENT"],
+    [13, 6, 0, 7, 0, "IMAGE"],
+    [14, 6, 0, 9, 0, "IMAGE"],
+    [15, 8, 0, 9, 5, "UPSCALE_MODEL"],
+    [16, 9, 0, 10, 0, "IMAGE"]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {"ds": {"scale": 0.8, "offset": [0, 0]}},
+  "version": 0.4
 }

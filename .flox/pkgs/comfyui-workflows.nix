@@ -1,47 +1,28 @@
-{ lib, stdenv, python3 }:
+{ lib, stdenv }:
 
 stdenv.mkDerivation {
   pname = "comfyui-workflows";
-  version = "1.0.1";
+  version = "1.0.2";
 
   src = ../../sources/workflows;
 
-  nativeBuildInputs = [ python3 ];
-
+  dontBuild = true;
   dontConfigure = true;
-
-  buildPhase = ''
-    runHook preBuild
-
-    # Generate Web UI format workflows from API format
-    # Web UI format has node positions and links array needed for rendering
-    python3 convert_to_webui.py . webui-output
-
-    runHook postBuild
-  '';
 
   installPhase = ''
     runHook preInstall
 
-    # Install Web UI format workflows (for user workflow browser)
+    # Install workflows (proper Web UI format for browser rendering)
     mkdir -p $out/share/comfyui/workflows
-    cp -r webui-output/* $out/share/comfyui/workflows/
-
-    # Install API format workflows (for CI/programmatic use)
-    mkdir -p $out/share/comfyui/workflows-api
     for dir in */; do
-      if [ "$dir" != "webui-output/" ]; then
-        cp -r "$dir" $out/share/comfyui/workflows-api/
-      fi
+      cp -r "$dir" $out/share/comfyui/workflows/
     done
-    # Copy any top-level json files (if any)
-    find . -maxdepth 1 -name "*.json" -exec cp {} $out/share/comfyui/workflows-api/ \;
 
     runHook postInstall
   '';
 
   meta = with lib; {
-    description = "Bundled example workflows for ComfyUI (Web UI + API formats)";
+    description = "Bundled example workflows for ComfyUI";
     license = licenses.mit;
     platforms = platforms.all;
   };
