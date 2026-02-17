@@ -40,7 +40,60 @@ This repo produces **five meta-packages** consumed by the Flox runtime environme
 |--------------|-------------|----------------|------------|
 | `comfyui-impact-subpack` | [`comfyui-impact-subpack.nix`](.flox/pkgs/comfyui-impact-subpack.nix) | Upstream + `_flox_build` suffix | Impact Subpack (UltralyticsDetectorProvider, SAMLoader) + bundled Python deps ([`comfyui-sam2`](.flox/pkgs/comfyui-sam2.nix), [`comfyui-thop`](.flox/pkgs/comfyui-thop.nix)) |
 | `comfyui-controlnet-aux` | [`comfyui-controlnet-aux.nix`](.flox/pkgs/comfyui-controlnet-aux.nix) | Upstream | ControlNet preprocessors (Canny, Depth, Pose, etc.) |
-| `comfyui-workflows` | [`comfyui-workflows.nix`](.flox/pkgs/comfyui-workflows.nix) | Own semver (`1.0.0`) | Example workflow JSONs for SD15, SDXL, SD3.5, and FLUX (txt2img, img2img, upscale, LoRA, inpaint, ControlNet) |
+| `comfyui-workflows` | [`comfyui-workflows.nix`](.flox/pkgs/comfyui-workflows.nix) | Own semver (`1.0.1`) | Example workflows in dual format: Web UI (for browser) + API (for CI) |
+
+## Workflow Formats
+
+The `comfyui-workflows` package provides example workflows in **two formats**:
+
+| Format | Location | Purpose |
+|--------|----------|---------|
+| **Web UI** | `$out/share/comfyui/workflows/` | For rendering in ComfyUI browser (has node positions, links array) |
+| **API** | `$out/share/comfyui/workflows-api/` | For CI/programmatic execution (minimal, just nodes and inputs) |
+
+### Format Details
+
+**API format** (source of truth in `sources/workflows/`):
+```json
+{
+  "1": { "class_type": "CheckpointLoaderSimple", "inputs": { "ckpt_name": "model.safetensors" } },
+  "2": { "class_type": "KSampler", "inputs": { "model": ["1", 0], ... } }
+}
+```
+
+**Web UI format** (generated at build time):
+```json
+{
+  "last_node_id": 7,
+  "last_link_id": 6,
+  "nodes": [{ "id": 1, "type": "CheckpointLoaderSimple", "pos": [100, 50], ... }],
+  "links": [[1, 1, 0, 2, 0, "*"], ...],
+  "version": 0.4
+}
+```
+
+### Converter Script
+
+The build runs `sources/workflows/convert_to_webui.py` to generate Web UI format from API format:
+
+```bash
+# Manual conversion (for testing)
+python3 sources/workflows/convert_to_webui.py sources/workflows /tmp/webui-output
+```
+
+The converter auto-arranges nodes in a grid layout. For complex workflows, you may want to manually export from ComfyUI's UI after loading the API format via the queue endpoint.
+
+### Using Workflows
+
+**In the browser:** Workflows are copied to `~/comfyui-work/user/default/workflows/` on activation. Open ComfyUI and load from the workflow browser.
+
+**For CI/automation:**
+```bash
+# Execute workflow via API
+curl -X POST http://localhost:8188/prompt \
+  -H "Content-Type: application/json" \
+  -d @"$FLOX_ENV/share/comfyui/workflows-api/SD15/sd15-txt2img.json"
+```
 
 ## Dependency Strategy
 
@@ -114,13 +167,23 @@ build-comfyui-packages/
 │       ├── comfyui-extras.nix # Meta-package aggregating all deps
 │       ├── comfyui-ultralytics.nix
 │       ├── comfyui-accelerate.nix
+│       ├── comfyui-workflows.nix
 │       ├── ...                # Individual package definitions
 │       └── timm.nix
-├── sources/                   # Vendored packages (wheels/tarballs/code)
-│   ├── color_matcher-0.6.0-py3-none-any.whl
+├── sources/
+│   ├── color_matcher-0.6.0-py3-none-any.whl  # Vendored wheels
 │   ├── cstr-*.tar.gz
 │   ├── img2texture-*.tar.gz
-│   └── ComfyUI-SafeCLIP-SDXL/  # Vendored custom node (no upstream repo)
+│   ├── ComfyUI-SafeCLIP-SDXL/  # Vendored custom node (no upstream repo)
+│   └── workflows/              # Example workflows (API format, source of truth)
+│       ├── convert_to_webui.py # Converter script (run at build time)
+│       ├── SD15/
+│       │   ├── sd15-txt2img.json
+│       │   ├── sd15-img2img.json
+│       │   └── ...
+│       ├── SDXL/
+│       ├── SD35/
+│       └── FLUX/
 └── result-*                   # Build output symlinks (gitignored)
 ```
 
