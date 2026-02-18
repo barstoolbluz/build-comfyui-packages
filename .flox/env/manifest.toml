@@ -53,3 +53,6 @@ echo ""
 [options]
 systems = ["x86_64-linux", "aarch64-linux", "x86_64-darwin", "aarch64-darwin"]
 cuda-detection = true
+
+# Overlays for platform-specific fixes
+# pyarrow tests fail on darwin (test_timezone_absent) - see .flox/lib/pkgs.nix

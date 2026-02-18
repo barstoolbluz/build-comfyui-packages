@@ -42,14 +42,20 @@
 # Utilities:
 #   - ffmpy (FFmpeg wrapper), img2texture, cstr
 #   - piexif, simpleeval, numba, gitpython, easydict, onnxruntime
+#
+# PLATFORM FIXES:
+# ---------------
+# Uses patched nixpkgs via .flox/lib/pkgs.nix to fix:
+#   - pyarrow test failures on darwin (test_timezone_absent)
 
-{ lib
-, python3
-, callPackage
-, stdenv
-}:
+{ system ? builtins.currentSystem }:
 
 let
+  # Import patched nixpkgs with platform-specific fixes
+  pkgs = import ../lib/pkgs.nix { inherit system; };
+  inherit (pkgs) lib callPackage stdenv;
+  python3 = pkgs.python313;
+
   # Torch-agnostic ML packages (rebuilt from source without torch deps)
   comfyui-ultralytics = callPackage ./comfyui-ultralytics.nix { };
   comfyui-timm = callPackage ./timm.nix { };

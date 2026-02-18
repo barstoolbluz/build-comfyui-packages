@@ -1,5 +1,8 @@
 run/
 cache/
-lib/
 log/
 !env/
+# Keep lib/pkgs.nix for platform-specific overlays
+!lib/
+lib/*
+!lib/pkgs.nix
