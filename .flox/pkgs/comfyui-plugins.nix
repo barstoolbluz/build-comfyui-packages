@@ -23,7 +23,7 @@
 
 stdenv.mkDerivation rec {
   pname = "comfyui-plugins";
-  version = "0.11.0";  # Tracks ComfyUI version
+  version = "0.14.2";  # Tracks ComfyUI version
 
   # Impact Pack v8.28
   src = fetchFromGitHub {

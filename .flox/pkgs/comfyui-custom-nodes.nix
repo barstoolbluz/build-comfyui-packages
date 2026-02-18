@@ -146,7 +146,7 @@ let
 
 in stdenv.mkDerivation rec {
   pname = "comfyui-custom-nodes";
-  version = "0.11.0";  # Tracks ComfyUI version
+  version = "0.14.2";  # Tracks ComfyUI version
 
   # We don't have a single src - we use multiple fetchFromGitHub sources
   dontUnpack = true;

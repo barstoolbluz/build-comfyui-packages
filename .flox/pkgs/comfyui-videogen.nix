@@ -54,7 +54,7 @@ let
 
 in stdenv.mkDerivation rec {
   pname = "comfyui-videogen";
-  version = "0.11.0";
+  version = "0.14.2";
 
   dontUnpack = true;
   dontBuild = true;
