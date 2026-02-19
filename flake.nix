@@ -54,7 +54,6 @@
           comfyui-extras = import ./.flox/pkgs/comfyui-extras.nix { inherit system; };
           comfyui-ultralytics = pkgs.callPackage ./.flox/pkgs/comfyui-ultralytics.nix {};
           comfyui-workflows = pkgs.callPackage ./.flox/pkgs/comfyui-workflows.nix {};
-          comfyui-download-models = pkgs.callPackage ./.flox/pkgs/comfyui-download-models.nix {};
         };
       }
     );
