@@ -45,17 +45,16 @@
 #
 # PLATFORM FIXES:
 # ---------------
-# Uses patched nixpkgs via .flox/lib/pkgs.nix to fix:
-#   - pyarrow test failures on darwin (test_timezone_absent)
+# When building via flake.nix, the pyarrow darwin fix overlay is applied
+# through the flake's pkgs. This file uses standard callPackage arguments.
 
-{ system ? builtins.currentSystem }:
+{ lib
+, python3
+, callPackage
+, stdenv
+}:
 
 let
-  # Import patched nixpkgs with platform-specific fixes
-  pkgs = import ../lib/pkgs.nix { inherit system; };
-  inherit (pkgs) lib callPackage stdenv;
-  python3 = pkgs.python313;
-
   # Torch-agnostic ML packages (rebuilt from source without torch deps)
   comfyui-ultralytics = callPackage ./comfyui-ultralytics.nix { };
   comfyui-timm = callPackage ./timm.nix { };
