@@ -13,6 +13,14 @@
         # test_timezone_absent fails because macOS handles timezone lookups differently
         pyarrowDarwinFix = final: prev:
           if prev.stdenv.hostPlatform.isDarwin then {
+            # Override python3Packages (used by default python3)
+            python3Packages = prev.python3Packages.override {
+              overrides = pfinal: pprev: {
+                pyarrow = pprev.pyarrow.overridePythonAttrs (old: {
+                  doCheck = false;
+                });
+              };
+            };
             python313Packages = prev.python313Packages.override {
               overrides = pfinal: pprev: {
                 pyarrow = pprev.pyarrow.overridePythonAttrs (old: {
