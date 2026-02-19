@@ -48,10 +48,9 @@
         # Re-export pkgs with the overlay applied
         legacyPackages = pkgs;
 
-        # Build packages using the fixed nixpkgs
-        # comfyui-extras imports its own pkgs with overlay, just pass system
+        # Build packages using pkgs with pyarrow darwin fix overlay applied
         packages = {
-          comfyui-extras = import ./.flox/pkgs/comfyui-extras.nix { inherit system; };
+          comfyui-extras = pkgs.callPackage ./.flox/pkgs/comfyui-extras.nix {};
           comfyui-ultralytics = pkgs.callPackage ./.flox/pkgs/comfyui-ultralytics.nix {};
           comfyui-workflows = pkgs.callPackage ./.flox/pkgs/comfyui-workflows.nix {};
         };
