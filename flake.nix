@@ -11,36 +11,27 @@
       let
         # Overlay to fix pyarrow tests on darwin
         # test_timezone_absent fails because macOS handles timezone lookups differently
+        # We override the python interpreters so their .pkgs attribute has the fix
+        pyarrowFix = pfinal: pprev: {
+          pyarrow = pprev.pyarrow.overridePythonAttrs (old: {
+            doCheck = false;
+          });
+        };
+
         pyarrowDarwinFix = final: prev:
           if prev.stdenv.hostPlatform.isDarwin then {
-            # Override python3Packages (used by default python3)
-            python3Packages = prev.python3Packages.override {
-              overrides = pfinal: pprev: {
-                pyarrow = pprev.pyarrow.overridePythonAttrs (old: {
-                  doCheck = false;
-                });
-              };
+            # Override python interpreters so python.pkgs has the fix
+            python3 = prev.python3.override {
+              packageOverrides = pyarrowFix;
             };
-            python313Packages = prev.python313Packages.override {
-              overrides = pfinal: pprev: {
-                pyarrow = pprev.pyarrow.overridePythonAttrs (old: {
-                  doCheck = false;
-                });
-              };
+            python313 = prev.python313.override {
+              packageOverrides = pyarrowFix;
             };
-            python312Packages = prev.python312Packages.override {
-              overrides = pfinal: pprev: {
-                pyarrow = pprev.pyarrow.overridePythonAttrs (old: {
-                  doCheck = false;
-                });
-              };
+            python312 = prev.python312.override {
+              packageOverrides = pyarrowFix;
             };
-            python311Packages = prev.python311Packages.override {
-              overrides = pfinal: pprev: {
-                pyarrow = pprev.pyarrow.overridePythonAttrs (old: {
-                  doCheck = false;
-                });
-              };
+            python311 = prev.python311.override {
+              packageOverrides = pyarrowFix;
             };
           } else {};
 
